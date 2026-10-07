@@ -13,3 +13,5 @@ Zet in de instellingen van deze repository onder **Pages** de bron op de branch 
 ## Toepen testen
 
 `node toepen/tests/engine.test.js` speelt duizenden willekeurige potjes en controleert de spelregels.
+
+Laatste update: Pages ingeschakeld.
