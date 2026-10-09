@@ -10,6 +10,7 @@
   var NET = window.PokerNet;
   var $ = function (id) { return document.getElementById(id); };
   var SAVE_SOLO = 'poker-saved-solo', SAVE_HOST = 'poker-saved-host', SAVE_COUNT = 'poker-count-v1';
+  var PENDING = 'poker-pending', MINE = 'poker-mytable';   // buy-in taken but not yet seated; the table you sit at as a friend
   var ROOM_CODE = 'kamer';
   var game = null;          // {kind:'solo'|'host'|'guest', table?, host?, guest?, db?, code?, pub?, me?, undo?}
   var oddsCache = { key: '', value: null };
@@ -452,9 +453,23 @@
     }
     var j = new URLSearchParams(location.search).get('join');
     if (j) $('join-code').value = j.toUpperCase();
-    var saved = store.get(SAVE_HOST);
-    status('online-status', saved ? 'Je had een tafel open (code ' + saved.code + '). Open die weer om verder te spelen.' : '');
+    var saved = store.get(SAVE_HOST), mine = store.get(MINE);
+    var resumeHost = $('btn-resume-host'), resumeGuest = $('btn-resume-guest');
+    resumeHost.hidden = !saved;
+    if (saved) resumeHost.textContent = 'Hervat mijn tafel (' + saved.code + ')';
+    resumeGuest.hidden = !mine || (saved && saved.code === mine.code);
+    if (mine) resumeGuest.textContent = 'Terug naar tafel ' + mine.code;
+    $('resume-box').hidden = resumeHost.hidden && resumeGuest.hidden;
+    status('online-status', '');
   }
+  $('btn-resume-host').addEventListener('click', function () {
+    var saved = store.get(SAVE_HOST);
+    if (saved) openAsHost(saved.code, saved.name, saved.level, 0, true);
+  });
+  $('btn-resume-guest').addEventListener('click', function () {
+    var mine = store.get(MINE);
+    if (mine) rejoinGuest(mine);
+  });
   $('btn-host').addEventListener('click', function () {
     var name = ($('host-name').value || 'Host').trim().slice(0, 14) || 'Host';
     var L = M.LEVELS[+$('host-level').value - 1], buy = Math.floor(+$('host-buy').value);
@@ -505,29 +520,61 @@
     var buy = Math.floor(+$('join-buy').value);
     if (!code) return status('online-status', 'Vul de tafelcode in.');
     if (!M.LEVELS.some(function (l) { return buy >= l.min && buy <= l.max; })) return status('online-status', 'Kies een instap die bij een niveau past.');
-    if (!M.take(buy)) return status('online-status', 'Je bank is te laag voor deze instap.');
+    store.set(PENDING, { code: code, name: name, buy: buy, at: Date.now() });
+    if (!M.take(buy)) { store.del(PENDING); return status('online-status', 'Je bank is te laag voor deze instap.'); }
     status('online-status', 'Verbinden…');
     var db = NET.peer();
     db.joinHost(code).then(function () {
-      joinAsGuest(db, code, name, buy);
-    }).catch(function (e) { M.give(buy); status('online-status', e.message || 'Verbinden mislukt.'); });
+      joinAsGuest(db, code, name, buy, false);
+    }).catch(function (e) { M.give(buy); store.del(PENDING); status('online-status', e.message || 'Verbinden mislukt.'); });
   });
-  function joinAsGuest(db, code, name, buy) {
+  // Sit down at a friend's table. rejoin: you were already seated (app closed and opened again): no buy-in is charged.
+  function joinAsGuest(db, code, name, buy, rejoin) {
     game = { kind: 'guest', code: code, db: db, pub: null, me: null, buy: buy, cashed: false };
+    store.set(MINE, { code: code, name: name, buy: buy });
     game.guest = ON.guest(db, code, name, buy, function (kind, data) {
       if (!game || game.kind !== 'guest') return;
       if (kind === 'pub') { game.pub = data; refreshTable(); }
       if (kind === 'hands') {
         game.me = data;
-        if (data.error) { M.give(buy); msg(data.error); return; }
+        if (data.seat !== null && data.seat !== undefined && !data.error) { store.del(PENDING); }   // seated: the buy-in is final
+        if (data.code === 'not_seated') {
+          var pend = store.get(PENDING);
+          if (pend) { M.give(pend.buy); store.del(PENDING); }   // the buy-in was taken but there is no seat: give it back
+          store.del(MINE);
+          closeTable();
+          show('online');
+          status('online-status', 'Je zit niet meer aan deze tafel.' + (pend ? ' Je instap is teruggegeven.' : ''));
+          return;
+        }
+        if (data.error) { if (!rejoin) { M.give(buy); store.del(PENDING); store.del(MINE); } msg(data.error); return; }
         if (data.cashed && !game.cashed) { game.cashed = true; M.give(data.cashed); closeTable(); return; }
         refreshTable();
       }
       if (kind === 'chat') addChat(data);
       if (kind === 'sfx') sound(data);
-    }, loadAvatar());
+    }, loadAvatar(), rejoin);
     show('table');
     msg('Je wacht tot de volgende ronde begint…');
+  }
+
+  // Back to a table you were sitting at (no buy-in).
+  function rejoinGuest(saved) {
+    var db = NET.peer();
+    status('online-status', 'Verbinden met tafel ' + saved.code + '…');
+    db.joinHost(saved.code).then(function () {
+      joinAsGuest(db, saved.code, saved.name, saved.buy, true);
+    }).catch(function (e) { status('online-status', e.message || 'Geen verbinding met de tafel. Probeer het later.'); });
+  }
+  // On start-up: a buy-in that was taken but never confirmed. Check the seat; give the money back if there is none.
+  function checkPending() {
+    var pend = store.get(PENDING);
+    if (!pend) return;
+    if (Date.now() - pend.at > 10 * 60000) { M.give(pend.buy); store.del(PENDING); return; }
+    var db = NET.peer();
+    db.joinHost(pend.code).then(function () {
+      joinAsGuest(db, pend.code, pend.name, pend.buy, true);
+    }).catch(function () {});
   }
 
   // ---- Chat ----------------------------------------------------------------------
@@ -759,6 +806,7 @@
     if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (e) {} }
     M.tick();
     ageCheck();
+    checkPending();
     var join = new URLSearchParams(location.search).get('join');
     show('menu');
     if (join) { go('online'); $('join-code').value = join.toUpperCase(); }

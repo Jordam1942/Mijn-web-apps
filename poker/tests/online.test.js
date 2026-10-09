@@ -159,6 +159,29 @@ test('a friend photo is only taken when it is a small JPEG from the app', () => 
   assert.strictEqual(host2.table.seats[1].img, 'data:image/jpeg;base64,/9j/AAAA');
 });
 
+test('a friend who comes back gets the same seat; a stranger does not get one', () => {
+  const net = makeNet();
+  const host = O.host(net.dbFor('H'), { code: 'rj', name: 'Host', level: { sb: 5, bb: 10, min: 200, max: 1000 }, speed: 'snel', turnTimer: 0, takeover: 0, rnd: seeded(5), later: () => ({}), cancel: () => {}, autoNext: false });
+  host.sitDown(500);
+  net.flush();
+  O.guest(net.dbFor('A'), 'rj', 'Anna', 400, () => {});
+  net.flush();
+  const seatBefore = host.table.seats.findIndex(s => s.id === 'A');
+  assert.ok(seatBefore > 0, 'Anna zit niet aan tafel');
+  // the app was closed and opened again: same phone, so same id
+  let got = null;
+  O.guest(net.dbFor('A'), 'rj', 'Anna', 400, (kind, v) => { if (kind === 'hands') got = v; }, null, true);
+  net.flush();
+  assert.strictEqual(got && got.seat, seatBefore, 'Anna kreeg niet haar plek terug');
+  assert.strictEqual(host.table.seats.filter(s => s.id === 'A').length, 1, 'Anna staat er dubbel in');
+  // a stranger who asks to come back: told they are not seated, nothing changes
+  let stranger = null;
+  O.guest(net.dbFor('C'), 'rj', 'Carla', 400, (kind, v) => { if (kind === 'hands') stranger = v; }, null, true);
+  net.flush();
+  assert.strictEqual(stranger && stranger.code, 'not_seated');
+  assert.strictEqual(host.table.seats.filter(s => s.id === 'C').length, 0, 'Carla is toch gezet');
+});
+
 let failed = 0;
 for (const [name, fn] of tests) {
   try { fn(); console.log('ok  ' + name); }

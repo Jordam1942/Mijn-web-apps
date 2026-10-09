@@ -67,6 +67,13 @@
     unsub.push(db.onChildAdded(base(code) + '/join', function (key, req) {
       db.remove(base(code) + '/join/' + key);
       if (!req || !req.uid) return;
+      // a friend who was seated before (app closed, reopened): give the seat back, or say they are no longer there. No money is taken.
+      if (req.rejoin) {
+        var at = seatOf(req.uid);
+        if (at >= 0) db.set(handsPath(code, req.uid), { seat: at, cards: [], legal: null });
+        else db.set(handsPath(code, req.uid), { error: 'Je zit niet meer aan deze tafel.', code: 'not_seated' });
+        return;
+      }
       if (table.hand && !table.hand.done) queuedJoins.push(req); else sit(req, true);
     }));
     unsub.push(db.onChildAdded(base(code) + '/inbox', function (key, msg) {
@@ -93,11 +100,11 @@
   }
 
   // A friend: sends a request to sit down, then follows the table and sends moves.
-  function guest(db, code, name, buy, cb, img) {
+  function guest(db, code, name, buy, cb, img, rejoin) {
     var uid = db.uid, unsub = [], me = { seat: null, cards: [], legal: null, error: null };
     unsub.push(db.on(handsPath(code, uid), function (p) {
       if (!p) return;
-      me = { seat: p.seat, cards: p.cards || [], legal: p.legal || null, deadline: p.deadline || 0, error: p.error || null, cashed: p.cashed };
+      me = { seat: p.seat, cards: p.cards || [], legal: p.legal || null, deadline: p.deadline || 0, error: p.error || null, code: p.code || null, cashed: p.cashed };
       if (cb) cb('hands', me);
     }));
     unsub.push(db.on(base(code) + '/pub', function (pub) { if (cb) cb('pub', pub); }));
@@ -106,7 +113,7 @@
       // only sounds from the last few seconds: older ones are still there when you join
       if (msg && cb && Date.now() - msg.at < 4000) cb('sfx', msg.k);
     }));
-    db.push(base(code) + '/join', { uid: uid, name: name, buy: buy, img: safeImg(img) });
+    db.push(base(code) + '/join', { uid: uid, name: name, buy: buy, img: safeImg(img), rejoin: !!rejoin });
     return {
       me: function () { return me; },
       act: function (action) { db.push(base(code) + '/inbox', { uid: uid, action: action }); },
