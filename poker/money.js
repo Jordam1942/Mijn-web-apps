@@ -1,13 +1,15 @@
 /*
- * Your bank (play money), the 20 table levels, and the income per minute.
- * Fiches come in every minute, also while the app is closed, up to one week at a time.
+ * Your bank (play money), the 20 table levels, and the income per day.
+ * 200 fiches per day, also while the app is closed, up to one week at a time.
  */
 (function (root) {
   'use strict';
 
   var KEY = 'poker-bank-v1';
-  var RATE = 20;             // fiches per minute
-  var MAX_MINUTES = 7 * 24 * 60; // at most one week of income at a time, also while the app is closed
+  var PER_DAY = 200;                         // fiches per day, also while the app is closed
+  var DAY_MS = 86400000;
+  var STEP_MS = DAY_MS / PER_DAY;            // one fiche every 7 minutes 12 seconds
+  var WEEK_MS = 7 * DAY_MS;                  // at most one week of income at a time
   var START = 2000;
 
   // Level n: blinds sb/bb, buy-in between min and max.
@@ -27,21 +29,18 @@
   function write(b) { try { localStorage.setItem(KEY, JSON.stringify(b)); } catch (e) {} }
 
   // Credit the income since the last time. Called on start-up and every few seconds while open.
+  // The time is kept exactly, so no fiches are lost by rounding.
   function tick(now) {
     now = now || Date.now();
-    var b = read() || { balance: START, at: now };
-    var elapsed = (now - b.at) / 60000, minutes;
-    if (elapsed >= 1) {
-      minutes = Math.min(Math.floor(elapsed), MAX_MINUTES);
-      b.balance += minutes * RATE;
-      b.at = elapsed > MAX_MINUTES ? now : b.at + minutes * 60000;   // past the limit: start counting again from now
-    }
+    var b = read() || { balance: START, at: now }, elapsed = now - b.at, n;
+    if (elapsed > WEEK_MS) { b.balance += PER_DAY * 7; b.at = now; }   // past a week: a week's income, counting starts again
+    else if (elapsed >= STEP_MS) { n = Math.floor(elapsed / STEP_MS); b.balance += n; b.at += n * STEP_MS; }
     write(b);
     return b.balance;
   }
 
   var api = {
-    RATE: RATE, MAX_MINUTES: MAX_MINUTES, START: START, LEVELS: LEVELS,
+    PER_DAY: PER_DAY, START: START, LEVELS: LEVELS,
     tick: tick,
     balance: function () { return tick(Date.now()); },
     // Take fiches out of the bank (for a buy-in). False when there is not enough.
