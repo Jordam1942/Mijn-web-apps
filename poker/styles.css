@@ -285,3 +285,5 @@ table.score td.hostbtns { text-align: left; padding-bottom: 10px; }
 .pick-btn { padding: 2px; border-radius: 50%; border: 2px solid transparent; background: none; cursor: pointer; }
 .pick-btn svg { width: 100%; height: auto; display: block; border-radius: 50%; }
 .pick-btn.on { border-color: var(--gold-hi); box-shadow: 0 0 0 2px var(--gold-lo); }
+.btn small { display: block; } /* keeps the sub text under the label */
+.btn > small { display: block; font-weight: 500; font-size: 12.5px; opacity: 0.85; margin-top: 2px; }
