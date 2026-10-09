@@ -699,7 +699,7 @@
   ];
   function renderSettings() {
     var p = P.get(), box = $('settings-box');
-    var html = '<div class="card-panel"><h3>Thema</h3><label class="field">Thema <select id="set-theme"><option value="system">Zoals het toestel</option><option value="dark">Donker</option><option value="light">Licht</option></select></label></div>';
+    var html = '';
     html += '<div class="card-panel"><h3>Tempo en tijd</h3>' +
       '<label class="field">Tempo computerspelers <select id="set-speed"><option value="rustig">Rustig</option><option value="normaal">Normaal</option><option value="snel">Snel</option></select></label>' +
       '<label class="field">Beurttimer voor jou (alleen bij vrienden) <select id="set-timer"><option value="0">Geen</option><option value="15">15 seconden</option><option value="30">30 seconden</option><option value="60">60 seconden</option></select></label>' +
@@ -709,11 +709,10 @@
     }).join('') + '</div>';
     html += '<div class="card-panel"><button class="btn" id="set-default">Standaardinstellingen</button><button class="btn danger" id="set-bank">Bank op 2.000 zetten</button><p class="fine">Speelgeld zonder waarde. Het spel heeft geen aankopen.</p></div>';
     box.innerHTML = html;
-    $('set-theme').value = p.theme; $('set-speed').value = p.speed; $('set-timer').value = String(p.turnTimer); $('set-takeover').value = String(p.takeover);
+    $('set-speed').value = p.speed; $('set-timer').value = String(p.turnTimer); $('set-takeover').value = String(p.takeover);
   }
   $('settings-box').addEventListener('change', function (e) {
     var t = e.target;
-    if (t.id === 'set-theme') { P.set('theme', t.value); P.apply(); }
     if (t.id === 'set-speed') P.set('speed', t.value);
     if (t.id === 'set-timer') P.set('turnTimer', +t.value);
     if (t.id === 'set-takeover') P.set('takeover', +t.value);

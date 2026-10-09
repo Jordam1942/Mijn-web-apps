@@ -41,14 +41,6 @@
   --btn-ink: #2a1f14;
   color-scheme: light;
 }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg: #f3ead6; --bg2: #e8dcc0; --ink: #2a1f14; --ink-soft: #5b4a36;
-    --gold: #9a7324; --gold-hi: #c99a3c; --gold-lo: #6f5118;
-    --panel: rgba(255, 252, 244, 0.9); --line: rgba(154, 115, 36, 0.45);
-    --shadow: 0 8px 24px rgba(60, 40, 10, 0.18); --btn-a: #fffdf6; --btn-b: #efe4c9; --btn-ink: #2a1f14; color-scheme: light;
-  }
-}
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; margin: 0; }

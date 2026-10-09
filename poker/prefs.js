@@ -6,7 +6,7 @@
   'use strict';
   var KEY = 'poker-prefs-v1';
   var DEFAULTS = {
-    theme: 'system',          // system | light | dark
+    theme: 'dark',            // the dark look is the only one
     sound: true,
     vibrate: true,
     wake: true,               // keep the screen on at a table
