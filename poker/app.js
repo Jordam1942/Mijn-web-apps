@@ -193,15 +193,70 @@
     msg('Je fiches zijn op. Kijk de ronde af en ga daarna naar het hoofdmenu.');
   }
 
-  // Fiches as a stack: more fiches, a taller stack. kind: pot | mini
+  // Fiches as piles, like at a real table: several piles, each one a few fiches high.
+  // kind: pot | bet | mini
   function chipStack(amount, kind) {
-    var n = Math.max(1, Math.min(kind === 'pot' ? 9 : 5, Math.round(Math.log10(amount + 1) * 2.2)));
-    var out = '<span class="chips ' + (kind || '') + '" aria-hidden="true">';
-    for (var i = 0; i < n; i++) out += '<i class="disc d' + (i % 3) + '"></i>';
+    var maxPiles = kind === 'pot' ? 4 : 2, maxHeight = kind === 'pot' ? 7 : (kind === 'bet' ? 5 : 4);
+    var piles = Math.max(1, Math.min(maxPiles, Math.round(Math.log10(amount + 1) * 1.5)));
+    var perPile = Math.max(1, Math.min(maxHeight, Math.round(Math.log10(amount / piles + 1) * 3)));
+    var out = '<span class="chipset ' + kind + '" aria-hidden="true">';
+    for (var p = 0; p < piles; p++) {
+      out += '<span class="pile">';
+      for (var k = 0; k < perPile; k++) out += '<i class="disc d' + ((p + k) % 3) + '"></i>';
+      out += '</span>';
+    }
     return out + '</span>';
   }
 
   // ---- Table rendering -------------------------------------------------------
+  // Bets: a pile next to each player, half way to the middle, so it never sits on the cards
+  var betEls = {};
+  function betSpot(i, pos, you) {
+    if (i === you) return { x: pos[i].x + 14, y: pos[i].y - 3 };   // your own bet: next to your picture
+    var dx = pos[i].x - 50, dy = pos[i].y - 50;
+    var f = Math.abs(dy) > Math.abs(dx) ? 0.4 : 0.22;               // above or below: further in, so it clears the name
+    return { x: pos[i].x - dx * f, y: pos[i].y - dy * f };
+  }
+  function renderBets(v, pos, you) {
+    var layer = $('t-bets'), seen = {};
+    v.seats.forEach(function (s, i) {
+      if (!pos[i]) return;
+      if (s.bet > 0) {
+        seen[i] = true;
+        var el = betEls[i];
+        if (!el) {
+          // a new bet starts at the player and flies to its spot
+          el = betEls[i] = document.createElement('div');
+          el.className = 'bet-el';
+          el.style.left = pos[i].x + '%'; el.style.top = pos[i].y + '%';
+          layer.appendChild(el);
+        }
+        el.innerHTML = chipStack(s.bet, 'bet') + '<span class="bet-amt">' + M.fmt(s.bet) + '</span>';
+        var spot = betSpot(i, pos, you);
+        requestAnimationFrame(function () { el.style.left = spot.x + '%'; el.style.top = spot.y + '%'; });
+        el.style.opacity = 1;
+      }
+    });
+    // bets that were collected in this street: they fly into the pot and disappear
+    Object.keys(betEls).forEach(function (k) {
+      if (seen[k]) return;
+      var el = betEls[k];
+      el.style.left = '50%'; el.style.top = '34%'; el.style.opacity = 0;
+      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 500);
+      delete betEls[k];
+    });
+  }
+  // The pot: in the middle above the cards; at the end of a hand it goes to the winner
+  function renderPot(v) {
+    var box = $('t-potbox');
+    if (v.pot <= 0) { box.innerHTML = ''; box.style.opacity = 0; return; }
+    box.innerHTML = chipStack(v.pot, 'pot') + '<strong>' + M.fmt(v.pot) + '</strong>';
+    box.style.opacity = 1;
+    var win = v.done && v.winners && v.winners.length ? v.winners[0] : null;
+    if (win !== null && lastPos[win]) { box.style.left = lastPos[win].x + '%'; box.style.top = lastPos[win].y + '%'; box.style.opacity = 0.35; }
+    else { box.style.left = '50%'; box.style.top = '34%'; }
+  }
+  var lastPos = {};
   // view: the table view (table.js), or a guest's combined view.
   var lastBoard = 0, lastDone = true;
   function renderTable(v) {
@@ -210,18 +265,19 @@
     lastBoard = v.board.length; lastDone = v.done;
     var dealBoard = newStreet && P.fx('fxDeal'), dealHole = newHand && P.fx('fxDeal');
     $('t-level').textContent = v.level.name + ' · ' + M.fmt(v.level.sb) + '/' + M.fmt(v.level.bb);
-    $('t-potbox').innerHTML = v.pot > 0 ? chipStack(v.pot, 'pot') + '<strong>' + M.fmt(v.pot) + '</strong>' : '';
+    renderPot(v);
     $('t-chat').hidden = !game || game.kind === 'solo';
     // Board
     var board = '';
     for (var b = 0; b < 5; b++) board += v.board[b] !== undefined ? '<span class="' + (dealBoard && b >= v.board.length - 3 ? 'deal' : '') + '">' + ART.card(v.board[b]) + '</span>' : '<span class="slot"></span>';
     $('board').innerHTML = board;
     // Seats, you at the bottom, the others around the felt
-    var seats = '';
+    var seats = '', pos = {};
     v.seats.forEach(function (s, i) {
       if (s.kind === 'empty' || (s.out && !v.done && !s.cards.length && s.stack === 0)) return;
       var ang = (90 + ((i - you + n) % n) * 360 / n) * Math.PI / 180;
       var left = 50 + 42 * Math.cos(ang), top = 50 + 40 * Math.sin(ang);
+      pos[i] = { x: left, y: top };
       var cls = 'seat' + (s.turn ? ' turn' : '') + (s.folded ? ' folded' : '') + (s.out ? ' out' : '') + (i === you ? ' you' : '') + (v.winners && v.winners.indexOf(i) >= 0 && P.fx('fxWin') ? ' win' : '');
       var hole = '';
       if (!s.folded && s.cards && s.cards.length) hole = s.cards.map(function (c) { return '<span class="' + (dealHole ? 'deal' : '') + '">' + ART.card(c) + '</span>'; }).join('');
@@ -232,10 +288,11 @@
         (s.button ? '<span class="dealer" aria-label="Knop">D</span>' : '') +
         '<span class="nm">' + esc(s.name) + '</span>' +
         '<span class="st">' + chipStack(s.stack, 'mini') + M.fmt(s.stack) + '</span>' + tag +
-        (s.bet > 0 ? '<span class="bet">' + chipStack(s.bet, 'mini') + M.fmt(s.bet) + '</span>' : '') +
         '</div>';
     });
     $('seats').innerHTML = seats;
+    lastPos = pos;
+    renderBets(v, pos, you);
     // Winners banner
     if (v.done && v.result && v.result.length) {
       $('seats').insertAdjacentHTML('beforeend', '<div class="winner-banner">' + esc(v.result.join(' · ')) + '</div>');
