@@ -12,6 +12,9 @@
   var WEEK_MS = 7 * DAY_MS;                  // at most one week of income at a time
   var START = 2000;
 
+  // Each level is named after a poker hand, from the lowest to the highest (see the handbook)
+  var NAMES = ['Hoge kaart', 'Paar', 'Twee paar', 'Drie gelijke', 'Straat', 'Kleur', 'Full house', 'Carré', 'Straight flush', 'Royal flush'];
+
   // Level n: blinds sb/bb, buy-in between min and max.
   var LEVELS = [
     [5, 10, 200, 1000], [10, 20, 400, 2000], [15, 30, 600, 3000], [25, 50, 1000, 5000],
@@ -20,7 +23,7 @@
     [1500, 3000, 60000, 300000], [2500, 5000, 100000, 500000], [4000, 8000, 150000, 800000], [6000, 12000, 250000, 1200000],
     [10000, 20000, 400000, 2000000], [15000, 30000, 600000, 3000000], [25000, 50000, 1000000, 5000000], [50000, 100000, 2000000, 10000000]
   ].slice(0, 10).map(function (r, i) {
-    return { level: i + 1, sb: r[0], bb: r[1], min: r[2], max: r[3] };
+    return { level: i + 1, name: NAMES[i], sb: r[0], bb: r[1], min: r[2], max: r[3] };
   });
 
   function read() {

@@ -91,7 +91,7 @@
       b.className = 'level';
       b.setAttribute('aria-selected', setup.level === l.level ? 'true' : 'false');
       b.disabled = bal < l.min;
-      b.innerHTML = '<b>Niveau ' + l.level + '</b><small>Blinds ' + M.fmt(l.sb) + ' / ' + M.fmt(l.bb) + '</small><small>Instap ' + M.fmt(l.min) + ' – ' + M.fmt(l.max) + '</small>';
+      b.innerHTML = '<b>' + esc(l.name) + '</b><small>Niveau ' + l.level + ' · ' + M.fmt(l.sb) + ' / ' + M.fmt(l.bb) + '</small><small>Instap ' + M.fmt(l.min) + ' – ' + M.fmt(l.max) + '</small>';
       b.addEventListener('click', function () { setup.level = l.level; setup.buy = Math.min(l.max, Math.max(l.min, Math.floor(M.balance() / 100) * 100)); renderSetup(); });
       list.appendChild(b);
     });
@@ -209,7 +209,7 @@
     var newStreet = v.board.length > lastBoard, newHand = !v.done && lastDone;
     lastBoard = v.board.length; lastDone = v.done;
     var dealBoard = newStreet && P.fx('fxDeal'), dealHole = newHand && P.fx('fxDeal');
-    $('t-level').textContent = 'Niveau ' + v.level.level + ' · ' + M.fmt(v.level.sb) + '/' + M.fmt(v.level.bb);
+    $('t-level').textContent = v.level.name + ' · ' + M.fmt(v.level.sb) + '/' + M.fmt(v.level.bb);
     $('t-pot').textContent = 'Pot ' + M.fmt(v.pot);
     $('t-chat').hidden = !game || game.kind === 'solo';
     // Board
@@ -462,7 +462,7 @@
   function renderOnline() {
     var sel = $('host-level');
     if (!sel.options.length) {
-      M.LEVELS.forEach(function (l) { var o = document.createElement('option'); o.value = l.level; o.textContent = 'Niveau ' + l.level + ' (' + M.fmt(l.sb) + '/' + M.fmt(l.bb) + ')'; sel.appendChild(o); });
+      M.LEVELS.forEach(function (l) { var o = document.createElement('option'); o.value = l.level; o.textContent = l.name + ' (' + M.fmt(l.sb) + '/' + M.fmt(l.bb) + ')'; sel.appendChild(o); });
       sel.value = '1';
     }
     var j = new URLSearchParams(location.search).get('join');
