@@ -253,8 +253,7 @@
     if (!P.get().odds) { $('odds').hidden = true; return; }
     $('odds').hidden = false;
     if (!me || !me.cards || !me.cards.length || me.cards[0] === null || me.folded) {
-      $('odds-pct').textContent = '–'; $('odds-win').style.width = '0'; $('odds-tie').style.width = '0'; $('odds-lose').style.width = '0';
-      $('odds-hand').textContent = me && me.folded ? 'Je hebt gepast' : 'Wacht op de kaarten';
+      $('odds-pct').textContent = '–'; $('odds-fill').style.height = '0';
       return;
     }
     var opp = v.seats.filter(function (s, i) { return i !== you && !s.out && !s.folded && s.kind !== 'empty'; }).length;
@@ -263,14 +262,9 @@
       oddsCache.key = key;
       oddsCache.value = opp > 0 ? A.odds(me.cards, v.board, opp, 300) : { win: 1, tie: 0, lose: 0 };
     }
-    var o = oddsCache.value, share = A.share(o);
+    var share = A.share(oddsCache.value);
     $('odds-pct').textContent = Math.round(share * 100) + '%';
-    $('odds-win').style.width = (o.win * 100).toFixed(1) + '%';
-    $('odds-tie').style.width = (o.tie * 100).toFixed(1) + '%';
-    $('odds-lose').style.width = (o.lose * 100).toFixed(1) + '%';
-    var text = 'Voor de flop: twee kaarten';
-    if (v.board.length >= 3) { var ev = A.currentHand(me.cards, v.board); text = 'Nu: ' + E.describe(ev); }
-    $('odds-hand').textContent = text;
+    $('odds-fill').style.height = (share * 100).toFixed(1) + '%';
   }
 
   // Buttons: only when it is your turn

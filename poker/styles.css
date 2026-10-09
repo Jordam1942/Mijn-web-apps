@@ -268,5 +268,14 @@ table.score td.hostbtns { text-align: left; padding-bottom: 10px; }
 .seat.you .hole .card-face { width: 46px; height: 64px; }
 @media (max-height: 760px) {
   .board .card-face, .board .slot { width: 38px; height: 54px; }
-  .seat.you .hole .card-face { width: 42px; height: 58px; }
+  .seat.you .hole .card-face { width: 48px; height: 67px; }
 }
+
+/* Chance: a slim bar in the bottom right corner, filling from the bottom up */
+.felt > .odds { position: absolute; right: 6px; bottom: 6px; width: 40px; height: 118px; margin: 0; z-index: 6; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px; background: rgba(10, 8, 9, 0.8); border: 1px solid var(--gold-lo); border-radius: 12px; }
+.felt > .odds strong { font-family: var(--serif); font-size: 13px; color: var(--gold-hi); font-variant-numeric: tabular-nums; }
+.vbar { position: relative; flex: 1; width: 12px; border-radius: 6px; background: rgba(122, 20, 36, 0.7); overflow: hidden; }
+.vbar span { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: linear-gradient(#f0cf7a, #b98b33); transition: height 0.4s ease; }
+/* Your own cards: in the middle, above your seat, big enough to read */
+.seat.you .hole { left: 50%; right: auto; top: -92px; bottom: auto; transform: translateX(-50%); }
+.seat.you .hole .card-face { width: 56px; height: 78px; }
