@@ -129,7 +129,7 @@
   function soloOptions(L) {
     var p = P.get();
     return {
-      level: L, speed: p.speed, turnTimer: p.turnTimer, takeover: 0,
+      level: L, speed: p.speed, turnTimer: 0, takeover: 0,   // offline: no timer, you take all the time you want
       onChange: function (i, view) { if (i === 0 && game && game.kind === 'solo') { renderTable(view); saveSolo(); } },
       onCashOut: function (i, amount) {
         if (i !== 0) return;
@@ -673,7 +673,7 @@
     var html = '<div class="card-panel"><h3>Thema</h3><label class="field">Thema <select id="set-theme"><option value="system">Zoals het toestel</option><option value="dark">Donker</option><option value="light">Licht</option></select></label></div>';
     html += '<div class="card-panel"><h3>Tempo en tijd</h3>' +
       '<label class="field">Tempo computerspelers <select id="set-speed"><option value="rustig">Rustig</option><option value="normaal">Normaal</option><option value="snel">Snel</option></select></label>' +
-      '<label class="field">Beurttimer voor jou <select id="set-timer"><option value="0">Geen</option><option value="15">15 seconden</option><option value="30">30 seconden</option><option value="60">60 seconden</option></select></label>' +
+      '<label class="field">Beurttimer voor jou (alleen bij vrienden) <select id="set-timer"><option value="0">Geen</option><option value="15">15 seconden</option><option value="30">30 seconden</option><option value="60">60 seconden</option></select></label>' +
       '<label class="field">Computer neemt over na (vrienden weg) <select id="set-takeover"><option value="0">Nooit</option><option value="30">30 seconden</option><option value="45">45 seconden</option><option value="60">60 seconden</option></select></label></div>';
     html += '<div class="card-panel"><h3>Aan of uit</h3>' + TOGGLES.map(function (t) {
       return '<label class="toggle"><span>' + t[1] + '</span><input type="checkbox" data-set="' + t[0] + '"' + (p[t[0]] ? ' checked' : '') + '></label>';
