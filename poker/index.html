@@ -123,6 +123,15 @@
   <div class="scroll-box">
     <p class="hint">Iedereen speelt op de eigen telefoon. Het spel heeft internet nodig om elkaar te vinden.</p>
     <div class="card-panel">
+      <h3>Mijn foto</h3>
+      <p class="fine">Iedereen aan tafel ziet deze foto als je personage. Kies alleen een foto van jezelf, of geen.</p>
+      <div class="row between">
+        <img id="my-avatar-prev" class="avatar-prev" alt="" hidden>
+        <input type="file" id="my-avatar-file" accept="image/*">
+        <button class="btn small danger" id="my-avatar-del" hidden>Verwijder</button>
+      </div>
+    </div>
+    <div class="card-panel">
       <h3>Open een tafel</h3>
       <label class="field">Je naam <input id="host-name" maxlength="14" value="Jij"></label>
       <label class="field">Instap <input id="host-buy" type="number" step="100" value="1000"></label>

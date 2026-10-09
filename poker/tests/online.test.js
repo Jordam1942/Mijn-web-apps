@@ -143,6 +143,22 @@ test('a friend who leaves mid-hand gets the fiches back after the hand', () => {
   assert.strictEqual(host.table.seats[1].kind, 'empty', 'Anna zit nog aan tafel: ' + JSON.stringify(host.table.seats.map(s => [s.name, s.kind, s.stack, s.leaving])) + ' hand done=' + !!(host.table.hand && host.table.hand.done) + ' inbox=' + Object.keys(net.store).filter(k => k.includes('inbox')).join(','));
 });
 
+test('a friend photo is only taken when it is a small JPEG from the app', () => {
+  const net = makeNet();
+  const host = O.host(net.dbFor('H'), { code: 'ph', name: 'Host', level: { sb: 5, bb: 10, min: 200, max: 1000 }, speed: 'snel', turnTimer: 0, takeover: 0, rnd: seeded(2), later: () => ({}), cancel: () => {}, autoNext: false });
+  host.sitDown(500);
+  net.flush();
+  O.guest(net.dbFor('A'), 'ph', 'Anna', 400, () => {}, 'data:image/png;base64,AAAA');
+  net.flush();
+  assert.strictEqual(host.table.seats[1].img, null, 'een png is geaccepteerd');
+  // a second table, so the friend sits down straight away (no hand is running yet)
+  const host2 = O.host(net.dbFor('H2'), { code: 'pj', name: 'Host', level: { sb: 5, bb: 10, min: 200, max: 1000 }, speed: 'snel', turnTimer: 0, takeover: 0, rnd: seeded(3), later: () => ({}), cancel: () => {}, autoNext: false });
+  net.flush();
+  O.guest(net.dbFor('B'), 'pj', 'Bram', 400, () => {}, 'data:image/jpeg;base64,/9j/AAAA');
+  net.flush();
+  assert.strictEqual(host2.table.seats[1].img, 'data:image/jpeg;base64,/9j/AAAA');
+});
+
 let failed = 0;
 for (const [name, fn] of tests) {
   try { fn(); console.log('ok  ' + name); }

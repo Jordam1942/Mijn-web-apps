@@ -21,7 +21,7 @@
     var T = {
       level: cfg.level,
       seats: (cfg.seats || []).map(function (s, i) {
-        return { id: s.id || ('s' + i), name: s.name || ('Speler ' + (i + 1)), kind: s.kind || 'empty', style: s.style || 'gemiddeld', stack: s.stack || 0, persona: s.persona || 0, leaving: false };
+        return { id: s.id || ('s' + i), name: s.name || ('Speler ' + (i + 1)), kind: s.kind || 'empty', style: s.style || 'gemiddeld', stack: s.stack || 0, persona: s.persona || 0, img: s.img || null, leaving: false };
       }),
       dealer: cfg.dealer || 0,
       handCount: 0,
@@ -206,7 +206,7 @@
           cards = shown ? hp.cards.slice() : hp.cards.map(function () { return null; });
         }
         return {
-          i: i, name: s.name, kind: s.kind, persona: s.persona,
+          i: i, name: s.name, kind: s.kind, persona: s.persona, img: s.img || null,
           stack: hp ? hp.stack : s.stack, bet: hp ? hp.bet : 0, total: hp ? hp.total : 0,
           folded: hp ? hp.folded : false, allIn: hp ? hp.allIn : false,
           out: hp ? hp.out : s.kind === 'empty', leaving: s.leaving,

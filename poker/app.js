@@ -226,7 +226,7 @@
       var tag = s.allIn ? '<span class="tag">all-in</span>' : (s.folded ? '<span class="tag">gepast</span>' : (s.leaving ? '<span class="tag">weg</span>' : ''));
       seats += '<div class="' + cls + '" style="left:' + left.toFixed(1) + '%;top:' + top.toFixed(1) + '%">' +
         '<div class="hole">' + hole + '</div>' +
-        ART.avatar(s.persona || 0) +
+        (s.img ? '<img class="avatar" src="' + s.img + '" alt="">' : ART.avatar(s.persona || 0)) +
         (s.button ? '<span class="dealer" aria-label="Knop">D</span>' : '') +
         '<span class="nm">' + esc(s.name) + '</span>' +
         '<span class="st">' + M.fmt(s.stack) + '</span>' + tag +
@@ -414,7 +414,36 @@
     var base = location.href.split('?')[0].split('#')[0];
     return base + '?join=' + encodeURIComponent(code);
   }
+  // Your own photo: shrunk to 96 x 96 JPEG, kept on this phone, shared only at a table you join or open.
+  function loadAvatar() { return store.get('poker-avatar') || null; }
+  function showAvatar() {
+    var img = loadAvatar();
+    $('my-avatar-prev').src = img || '';
+    $('my-avatar-prev').hidden = !img;
+    $('my-avatar-del').hidden = !img;
+  }
+  $('my-avatar-file').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var im = new Image();
+      im.onload = function () {
+        var c = document.createElement('canvas'), side = Math.min(im.width, im.height);
+        c.width = 96; c.height = 96;
+        c.getContext('2d').drawImage(im, (im.width - side) / 2, (im.height - side) / 2, side, side, 0, 0, 96, 96);
+        store.set('poker-avatar', c.toDataURL('image/jpeg', 0.8));
+        showAvatar();
+      };
+      im.onerror = function () { status('online-status', 'Die foto kan ik niet openen. Kies een andere.'); };
+      im.src = reader.result;
+    };
+    reader.readAsDataURL(f);
+  });
+  $('my-avatar-del').addEventListener('click', function () { store.del('poker-avatar'); $('my-avatar-file').value = ''; showAvatar(); });
+
   function renderOnline() {
+    showAvatar();
     var sel = $('host-level');
     if (!sel.options.length) {
       M.LEVELS.forEach(function (l) { var o = document.createElement('option'); o.value = l.level; o.textContent = 'Niveau ' + l.level + ' (' + M.fmt(l.sb) + '/' + M.fmt(l.bb) + ')'; sel.appendChild(o); });
@@ -439,7 +468,7 @@
     db.openHost(code, { resume: resume }).then(function () {
       game = { kind: 'host', code: code, db: db, level: L };
       game.host = ON.host(db, {
-        code: code, name: name, level: L, speed: P.get().speed, turnTimer: P.get().turnTimer, takeover: P.get().takeover,
+        code: code, name: name, level: L, img: loadAvatar(), speed: P.get().speed, turnTimer: P.get().turnTimer, takeover: P.get().takeover,
         onView: function (view) { renderTable(view); saveHost(); },
         onSound: function (k) { sound(k); },
         onLog: function (text) { msg(text); },
@@ -495,7 +524,7 @@
       }
       if (kind === 'chat') addChat(data);
       if (kind === 'sfx') sound(data);
-    });
+    }, loadAvatar());
     show('table');
     msg('Je wacht tot de volgende ronde begint…');
   }
