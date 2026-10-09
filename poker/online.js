@@ -20,7 +20,7 @@
   // Host: runs the table and answers the others. db: PokerNet backend. o: {code, name, level, speed, turnTimer, takeover, rnd, onView(view), onLog(text)}
   function host(db, o) {
     var code = o.code, uid = db.uid, seats = [], table, unsub = [], queuedJoins = [];
-    seats.push({ id: uid, name: o.name || 'Host', kind: 'human', stack: 0, persona: 0 });
+    seats.push({ id: uid, name: o.name || 'Host', kind: 'human', stack: 0, persona: 12 });
     for (var k = 1; k < 8; k++) seats.push({ id: null, name: 'Vrije stoel', kind: 'empty', stack: 0 });
     table = T.create({
       level: o.level, seats: seats, speed: o.speed, turnTimer: o.turnTimer, takeover: o.takeover, rnd: o.rnd, later: o.later, cancel: o.cancel, autoNext: o.autoNext,

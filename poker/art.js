@@ -53,8 +53,10 @@
     { name: 'Ivo', hair: '#4a3223', skin: '#c68e62', top: '#1d4b4a', style: 'short', glasses: true, brow: '#3a2a1c', eyes: '#2a2018', suit: true },
     { name: 'Jolien', hair: '#d8b06a', skin: '#fbd9bd', top: '#7a1420', style: 'long', brow: '#b08a4a', eyes: '#4a7a9a' },
     { name: 'Koen', hair: '#2b2b2b', skin: '#b87b52', top: '#34465a', style: 'short', beard: true, brow: '#2b2b2b', eyes: '#2a2018', suit: true },
-    { name: 'Lotte', hair: '#5a2e1d', skin: '#f6d2b4', top: '#4a3a6b', style: 'bun', brow: '#5a2e1d', eyes: '#3a5a3a' }
+    { name: 'Lotte', hair: '#5a2e1d', skin: '#f6d2b4', top: '#4a3a6b', style: 'bun', brow: '#5a2e1d', eyes: '#3a5a3a' },
+    { name: 'Jij', hair: '#6b4a2b', skin: '#f6d7bc', top: '#2b3a4a', style: 'short', brow: '#6b4a2b', eyes: '#3d6b8a', suit: true }
   ];
+  var YOU = PERSONAS.length - 1;   // your own character (the computer players never get it)
 
   // A portrait for the character with this index (0..11, wraps around).
   function avatar(i) {
@@ -98,7 +100,7 @@
   function name(i) { return PERSONAS[((i % PERSONAS.length) + PERSONAS.length) % PERSONAS.length].name; }
   function personaCount() { return PERSONAS.length; }
 
-  var api = { card: card, back: back, avatar: avatar, name: name, personaCount: personaCount };
+  var api = { card: card, back: back, avatar: avatar, name: name, personaCount: personaCount, YOU: YOU };
   root.PokerArt = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : this);

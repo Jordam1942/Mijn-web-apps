@@ -141,7 +141,7 @@
     };
   }
   function startSolo(L, buy, bots) {
-    var seats = [{ id: 'jij', name: 'Jij', kind: 'human', stack: buy, persona: 0 }], k, persona = 1, opts;
+    var seats = [{ id: 'jij', name: 'Jij', kind: 'human', stack: buy, persona: ART.YOU }], k, persona = 1, opts;
     for (k = 0; k < bots; k++) {
       var stack = Math.round((L.min + (L.max - L.min) * (0.25 + 0.6 * Math.random())) / 10) * 10;
       stack = Math.max(L.min, Math.min(L.max, stack));
