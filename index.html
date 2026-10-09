@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b3d26">
+<title>Mijn spellen</title>
+<link rel="manifest" href="hub.webmanifest">
+<link rel="icon" href="poker/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="poker/icons/icon-192.png">
+<style>
+  :root { --bg: #120c0e; --bg2: #2a0f17; --ink: #f4ecd9; --soft: #c9bda6; --gold: #f0cf7a; --line: rgba(210,169,79,.35); --panel: rgba(20,12,15,.82); color-scheme: dark; }
+  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --bg: #f3ead6; --bg2: #e8dcc0; --ink: #2a1f14; --soft: #5b4a36; --gold: #9a7324; --panel: rgba(255,252,244,.92); color-scheme: light; } }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { background: radial-gradient(120% 80% at 50% 0%, var(--bg2), var(--bg) 60%) fixed, var(--bg); color: var(--ink); font: 16px/1.4 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; display: flex; flex-direction: column; min-height: 100dvh; padding: env(safe-area-inset-top, 0) 16px env(safe-area-inset-bottom, 0); }
+  header { text-align: center; padding: 26px 0 18px; }
+  header h1 { font: 700 28px/1.1 Georgia, 'Times New Roman', serif; color: var(--gold); margin: 0; }
+  header p { margin: 8px 0 0; color: var(--soft); font-size: 14px; }
+  main { display: flex; flex-direction: column; gap: 14px; padding-bottom: 20px; }
+  a.game { display: grid; grid-template-columns: 72px 1fr; gap: 14px; align-items: center; text-decoration: none; color: inherit; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.3); min-height: 104px; }
+  a.game:active { transform: translateY(1px); }
+  a.game img { width: 72px; height: 72px; border-radius: 16px; }
+  a.game b { display: block; font: 700 19px Georgia, serif; color: var(--gold); }
+  a.game span { display: block; color: var(--soft); font-size: 14px; margin-top: 3px; }
+  footer { margin-top: auto; text-align: center; color: var(--soft); font-size: 12.5px; padding: 18px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Mijn spellen</h1>
+  <p>Kies een spel</p>
+</header>
+<main>
+  <a class="game" href="poker/">
+    <img src="poker/icons/icon-192.png" alt="">
+    <div><b>Royal Flush Society</b><span>Texas Hold'em met speelgeld. 18+.</span></div>
+  </a>
+  <a class="game" href="toepen/">
+    <img src="toepen/icons/icon-192.png" alt="">
+    <div><b>Toepen</b><span>Kaartspel, alleen of met vrienden.</span></div>
+  </a>
+</main>
+<footer>Speelgeld zonder waarde. Geen aankopen.</footer>
+<script>
+  if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('hub-sw.js'); });
+</script>
+</body>
+</html>

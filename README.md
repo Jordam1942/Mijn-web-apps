@@ -11,6 +11,10 @@ Mijn webapps, elk in een eigen map.
 
 Zet in de instellingen van deze repository onder **Pages** de bron op de branch `main` (map `/ (root)`). De app staat dan op `https://jordam1942.github.io/Mijn-web-apps/toepen/`.
 
+## Mijn spellen (menu-app)
+
+De startpagina `index.html` is een menu waarin je Royal Flush Society of Toepen kiest. Installeer deze ene app op je telefoon om beide spellen te openen.
+
 ## Royal Flush Society op GitHub Pages
 
 De app staat op `https://jordam1942.github.io/Mijn-web-apps/poker/`.
