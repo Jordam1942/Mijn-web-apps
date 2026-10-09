@@ -22,7 +22,7 @@
   // Host: runs the table and answers the others. db: PokerNet backend. o: {code, name, level, speed, turnTimer, takeover, rnd, onView(view), onLog(text)}
   function host(db, o) {
     var code = o.code, uid = db.uid, seats = [], table, unsub = [], queuedJoins = [], leftBefore = {};
-    seats.push({ id: uid, name: o.name || 'Host', kind: 'human', stack: 0, persona: 12, img: safeImg(o.img) });
+    seats.push({ id: uid, name: o.name || 'Host', kind: 'human', stack: 0, persona: (typeof o.persona === 'number' ? o.persona : 12), img: safeImg(o.img) });
     for (var k = 1; k < 8; k++) seats.push({ id: null, name: 'Vrije stoel', kind: 'empty', stack: 0 });
     table = T.create({
       level: o.level, seats: seats, speed: o.speed, turnTimer: o.turnTimer, takeover: o.takeover, rnd: o.rnd, later: o.later, cancel: o.cancel, autoNext: o.autoNext,
@@ -60,7 +60,8 @@
       if (!(buy >= lvl.min && buy <= lvl.max)) { db.set(handsPath(code, req.uid), { error: 'Instap moet tussen ' + lvl.min + ' en ' + lvl.max + ' liggen.' }); return; }
       for (var k = 1; k < 8; k++) if (table.seats[k].kind === 'empty' && free < 0) free = k;
       if (free < 0) { db.set(handsPath(code, req.uid), { error: 'De tafel is vol.' }); return; }
-      table.seats[free] = { id: req.uid, name: String(req.name || 'Vriend').slice(0, 14), kind: 'remote', style: 'gemiddeld', stack: buy, persona: free, img: safeImg(req.img), leaving: false };
+      var look = (typeof req.persona === 'number' && req.persona >= 0 && req.persona <= 12) ? req.persona : free;
+      table.seats[free] = { id: req.uid, name: String(req.name || 'Vriend').slice(0, 14), kind: 'remote', style: 'gemiddeld', stack: buy, persona: look, img: safeImg(req.img), leaving: false };
       db.set(handsPath(code, req.uid), { seat: free, cards: [], legal: null });
       if (o.onLog) o.onLog(table.seats[free].name + ' zit aan tafel.');
       if (startNow) table.startHand(); else table.publish();
@@ -110,7 +111,7 @@
   }
 
   // A friend: sends a request to sit down, then follows the table and sends moves.
-  function guest(db, code, name, buy, cb, img, rejoin) {
+  function guest(db, code, name, buy, cb, img, rejoin, persona) {
     var uid = db.uid, unsub = [], me = { seat: null, cards: [], legal: null, error: null };
     unsub.push(db.on(handsPath(code, uid), function (p) {
       if (!p) return;
@@ -123,7 +124,7 @@
       // only sounds from the last few seconds: older ones are still there when you join
       if (msg && cb && Date.now() - msg.at < 4000) cb('sfx', msg.k);
     }));
-    db.push(base(code) + '/join', { uid: uid, name: name, buy: buy, img: safeImg(img), rejoin: !!rejoin });
+    db.push(base(code) + '/join', { uid: uid, name: name, buy: buy, img: safeImg(img), rejoin: !!rejoin, persona: typeof persona === 'number' ? persona : undefined });
     return {
       me: function () { return me; },
       act: function (action) { db.push(base(code) + '/inbox', { uid: uid, action: action }); },

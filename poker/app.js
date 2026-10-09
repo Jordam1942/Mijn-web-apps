@@ -142,7 +142,7 @@
     };
   }
   function startSolo(L, buy, bots) {
-    var seats = [{ id: 'jij', name: 'Jij', kind: 'human', stack: buy, persona: ART.YOU }], k, persona = 1, opts;
+    var seats = [{ id: 'jij', name: 'Jij', kind: 'human', stack: buy, persona: myPersona() }], k, persona = 1, opts;
     for (k = 0; k < bots; k++) {
       var stack = Math.round((L.min + (L.max - L.min) * (0.25 + 0.6 * Math.random())) / 10) * 10;
       stack = Math.max(L.min, Math.min(L.max, stack));
@@ -412,6 +412,8 @@
   }
   // Your own photo: shrunk to 96 x 96 JPEG, kept on this phone, shared only at a table you join or open.
   function loadAvatar() { return store.get('poker-avatar') || null; }
+  // The character you chose in the settings (you are the default)
+  function myPersona() { var p = store.get('poker-persona'); return typeof p === 'number' && ART.PRESETS.indexOf(p) >= 0 ? p : ART.YOU; }
   function showAvatar() {
     var img = loadAvatar();
     $('my-avatar-prev').src = img || '';
@@ -478,7 +480,7 @@
     db.openHost(code, { resume: resume }).then(function () {
       game = { kind: 'host', code: code, db: db, level: L };
       game.host = ON.host(db, {
-        code: code, name: name, level: L, img: loadAvatar(), blindEvery: blindEvery || 0, nextLevel: nextLevel, speed: P.get().speed, turnTimer: P.get().turnTimer, takeover: P.get().takeover,
+        code: code, name: name, level: L, img: loadAvatar(), persona: myPersona(), blindEvery: blindEvery || 0, nextLevel: nextLevel, speed: P.get().speed, turnTimer: P.get().turnTimer, takeover: P.get().takeover,
         onView: function (view) { renderTable(view); saveHost(); },
         onSound: function (k) { sound(k); },
         onLog: function (text) { msg(text); },
@@ -565,7 +567,7 @@
       }
       if (kind === 'chat') addChat(data);
       if (kind === 'sfx') sound(data);
-    }, loadAvatar(), rejoin);
+    }, loadAvatar(), rejoin, myPersona());
     show('table');
     msg('Je wacht tot de volgende ronde begint…');
   }
@@ -781,7 +783,9 @@
   ];
   function renderSettings() {
     var p = P.get(), box = $('settings-box');
-    var html = '';
+    var pick = '<div class="card-panel"><h3>Mijn personage</h3><p class="fine">Zo zien de anderen je aan tafel. Een eigen foto gaat voor.</p><div class="pick">' +
+      ART.PRESETS.map(function (i) { return '<button class="pick-btn' + (i === myPersona() ? ' on' : '') + '" data-persona="' + i + '" aria-label="' + esc(ART.name(i)) + '">' + ART.avatar(i) + '</button>'; }).join('') + '</div></div>';
+    var html = pick;
     html += '<div class="card-panel"><h3>Tempo en tijd</h3>' +
       '<label class="field">Tempo computerspelers <select id="set-speed"><option value="rustig">Rustig</option><option value="normaal">Normaal</option><option value="snel">Snel</option></select></label>' +
       '<label class="field">Beurttimer voor jou (alleen bij vrienden) <select id="set-timer"><option value="0">Geen</option><option value="15">15 seconden</option><option value="30">30 seconden</option><option value="60">60 seconden</option></select></label>' +
@@ -801,6 +805,8 @@
     if (t.dataset && t.dataset.set) P.set(t.dataset.set, t.checked);
   });
   $('settings-box').addEventListener('click', function (e) {
+    var pb = e.target.closest('[data-persona]');
+    if (pb) { store.set('poker-persona', +pb.dataset.persona); renderSettings(); return; }
     if (e.target.id === 'set-default') confirmThen('Alle instellingen terugzetten naar de standaard?', function () { P.setMany(P.defaults()); P.apply(); renderSettings(); });
     if (e.target.id === 'set-bank') confirmThen('Je bank op 2.000 fiches zetten?', function () { M.reset(); renderSettings(); });
   });

@@ -57,6 +57,8 @@
     { name: 'Jij', hair: '#6b4a2b', skin: '#f6d7bc', top: '#2b3a4a', style: 'short', brow: '#6b4a2b', eyes: '#3d6b8a', suit: true }
   ];
   var YOU = PERSONAS.length - 1;   // your own character (the computer players never get it)
+  // the ten you can choose from in the settings: women and younger faces, plus your own character
+  var PRESETS = [0, 2, 3, 4, 5, 7, 8, 9, 11, YOU];
 
   // A portrait for the character with this index (0..11, wraps around).
   function avatar(i) {
@@ -100,7 +102,7 @@
   function name(i) { return PERSONAS[((i % PERSONAS.length) + PERSONAS.length) % PERSONAS.length].name; }
   function personaCount() { return PERSONAS.length; }
 
-  var api = { card: card, back: back, avatar: avatar, name: name, personaCount: personaCount, YOU: YOU };
+  var api = { card: card, back: back, avatar: avatar, name: name, personaCount: personaCount, YOU: YOU, PRESETS: PRESETS };
   root.PokerArt = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : this);

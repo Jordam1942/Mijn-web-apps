@@ -279,3 +279,9 @@ table.score td.hostbtns { text-align: left; padding-bottom: 10px; }
 /* Your own cards: in the middle, above your seat, big enough to read */
 .seat.you .hole { left: 50%; right: auto; top: -92px; bottom: auto; transform: translateX(-50%); }
 .seat.you .hole .card-face { width: 56px; height: 78px; }
+
+/* Choosing your character */
+.pick { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.pick-btn { padding: 2px; border-radius: 50%; border: 2px solid transparent; background: none; cursor: pointer; }
+.pick-btn svg { width: 100%; height: auto; display: block; border-radius: 50%; }
+.pick-btn.on { border-color: var(--gold-hi); box-shadow: 0 0 0 2px var(--gold-lo); }
