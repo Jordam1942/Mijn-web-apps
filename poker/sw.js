@@ -11,7 +11,10 @@ var FILES = [
 var FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 
 self.addEventListener('install', function (e) {
-  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(FILES); }));
+  // one file missing must not stop the install: cache what can be cached
+  e.waitUntil(caches.open(CACHE).then(function (c) {
+    return Promise.all(FILES.map(function (f) { return c.add(f).catch(function () {}); }));
+  }));
   self.skipWaiting();
 });
 
@@ -32,7 +35,10 @@ self.addEventListener('fetch', function (e) {
       caches.open(CACHE).then(function (c) { c.put(e.request, copy); });
       return res;
     }).catch(function () {
-      return caches.match(e.request, { ignoreSearch: true });
+      // offline: a page opens from the cache; the start page is the fallback for every address
+      return caches.match(e.request, { ignoreSearch: true }).then(function (hit) {
+        return hit || (e.request.mode === 'navigate' ? caches.match('index.html') : undefined);
+      });
     })
   );
 });

@@ -113,6 +113,7 @@ input[type="range"] { width: 100%; accent-color: var(--gold); height: 32px; }
 .bank-card strong { font-family: var(--serif); font-size: 32px; color: var(--gold-hi); font-variant-numeric: tabular-nums; }
 .bank-card small { color: var(--ink-soft); font-size: 12px; }
 .menu > .row { justify-content: center; }
+.legal { text-align: center; }
 .menu > .row .btn { flex: 1; min-width: 0; font-size: 14px; padding: 8px 6px; }
 
 /* Levels and buy-in */
