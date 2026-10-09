@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b3d26">
-<meta name="description" content="Royal Flush Society: Texas Hold'em met speelgeld. 18+. Geen echt geld.">
+<meta name="description" content="Royal Flush Society: Texas Hold'em met speelgeld. Geen echt geld.">
 <title>Royal Flush Society</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
@@ -16,13 +16,24 @@
 </head>
 <body>
 
+<!-- Warning at the start, shown once -->
+<div id="s-age" class="overlay" hidden>
+  <div class="sheet age">
+    <div class="crest" aria-hidden="true">♠</div>
+    <h2>Royal Flush Society</h2>
+    <p>Dit spel is voor volwassenen. Je speelt met speelgeld: fiches hebben geen waarde en je kunt ze nergens voor omzetten of kopen.</p>
+    <label class="check"><input type="checkbox" id="age-ok"> Ik ben 18 jaar of ouder</label>
+    <button class="btn gold big" id="age-go" disabled>Doorgaan</button>
+  </div>
+</div>
+
 <!-- Main menu -->
 <section id="s-menu" class="screen">
   <div class="menu">
     <div class="brand">
       <div class="crest" aria-hidden="true">♠</div>
       <h1>Royal Flush<br>Society</h1>
-      <p class="tag">Speelgeld · 18+</p>
+      <p class="tag">Speelgeld</p>
     </div>
     <div class="bank-card" aria-live="polite">
       <span>Je bank</span>
@@ -37,7 +48,6 @@
       <button class="btn" data-go="count">Fichetelling</button>
       <a class="btn ghost" href="../">Alle spellen</a>
     </div>
-    <p class="fine legal">Voor volwassenen (18+). Speelgeld zonder waarde: fiches kun je niet kopen of omzetten in echt geld.</p>
     <div class="row">
       <button class="btn ghost" data-go="settings">Instellingen</button>
       <a class="btn ghost" href="handleiding.html">Handleiding</a>
@@ -98,6 +108,7 @@
       <div class="row between"><button class="btn small ghost" id="raise-cancel">Annuleren</button><button class="btn small gold" id="raise-ok">Verhogen</button></div>
     </div>
     <button class="btn small ghost undo" id="b-undo" hidden>Ongedaan maken</button>
+    <button class="btn gold big" id="b-menu" hidden>Naar het hoofdmenu</button>
     <div class="act-row" id="act-row">
       <button class="act fold" id="b-fold">Passen</button>
       <button class="act call" id="b-call">Checken</button>

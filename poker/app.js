@@ -71,6 +71,14 @@
   }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
+  // ---- Warning at the start (once) ----
+  function ageCheck() {
+    if (store.get('poker-age-ok')) return;
+    $('s-age').hidden = false;
+    $('age-ok').addEventListener('change', function () { $('age-go').disabled = !this.checked; });
+    $('age-go').addEventListener('click', function () { store.set('poker-age-ok', true); $('s-age').hidden = true; });
+  }
+
   // ---- Setup -----------------------------------------------------------------
   var setup = { level: null };
   function renderSetup() {
@@ -81,7 +89,7 @@
       b.className = 'level';
       b.setAttribute('aria-selected', setup.level === l.level ? 'true' : 'false');
       b.disabled = bal < l.min;
-      b.innerHTML = '<span><b>Niveau ' + l.level + '</b><small>Blinds ' + M.fmt(l.sb) + ' / ' + M.fmt(l.bb) + '</small></span><small>' + M.fmt(l.min) + ' – ' + M.fmt(l.max) + '</small>';
+      b.innerHTML = '<b>Niveau ' + l.level + '</b><small>Blinds ' + M.fmt(l.sb) + ' / ' + M.fmt(l.bb) + '</small><small>Instap ' + M.fmt(l.min) + ' – ' + M.fmt(l.max) + '</small>';
       b.addEventListener('click', function () { setup.level = l.level; setup.buy = Math.min(l.max, Math.max(l.min, Math.floor(M.balance() / 100) * 100)); renderSetup(); });
       list.appendChild(b);
     });
@@ -182,24 +190,13 @@
     game = null;
     show('menu');
   }
-  // Out of fiches at the table: offer to buy in again, or leave.
-  function outOfChips(view) {
+  // Out of fiches: watch the rest of the hand, then go to the menu. No buying in again.
+  function outOfChips() {
     if (!game || game.kind !== 'solo') return;
-    var L = game.level, bal = M.balance();
     game.table.autoNext = false;
-    game.outShown = true;
-    var canBuy = bal >= L.min;
-    sheet('<h2>Je fiches zijn op</h2><p>Je kunt weer aanschuiven met minstens ' + M.fmt(L.min) + ' fiches. Je bank heeft nu ' + M.fmt(bal) + '.</p>',
-      [{ label: 'Opnieuw inkopen (' + M.fmt(Math.min(L.max, bal)) + ')', cls: 'gold', fn: function () {
-          var amount = Math.min(L.max, M.balance());
-          if (!M.take(amount)) return;
-          game.table.seats[0].stack = amount;
-          game.table.autoNext = true;
-          game.outShown = false;
-          game.table.startHand();
-        }, disabled: !canBuy },
-       { label: 'Naar het menu', cls: 'ghost', fn: exitSolo }]);
-    if (!canBuy) $('sheet-body').querySelector('.gold').disabled = true;
+    $('b-menu').hidden = false;
+    $('act-row').hidden = true;
+    msg('Je fiches zijn op. Kijk de ronde af en ga daarna naar het hoofdmenu.');
   }
 
   // ---- Table rendering -------------------------------------------------------
@@ -246,7 +243,7 @@
     renderActions(v);
     if (v.legal && !lastTurn) { sound('turn'); buzz(40); }
     lastTurn = !!v.legal;
-    if (game && game.kind === 'solo' && game.table && v.seats[0].stack === 0 && (v.done || !game.table.hand) && !game.outShown) { game.outShown = true; outOfChips(v); }
+    if (game && game.kind === 'solo' && game.table && v.seats[0].stack === 0 && (v.done || !game.table.hand)) outOfChips();
   }
 
   function renderOdds(v) {
@@ -284,6 +281,7 @@
     $('b-raise').disabled = !L || !L.canRaise;
     $('b-call').innerHTML = L && !L.canCheck ? 'Meegaan<small>' + M.fmt(L.toCall) + '</small>' : 'Checken';
     if (!L) closeRaise();
+    if (!(game && game.kind === 'solo' && game.table && v.seats[0].stack === 0 && (v.done || !game.table.hand))) $('b-menu').hidden = true;
     if (L && game) timerStart(v.deadline);
     else timerStop();
   }
@@ -709,6 +707,7 @@
     if (g) go(g.dataset.go);
   });
   $('btn-resume').addEventListener('click', function () { resumeSolo(); });
+  $('b-menu').addEventListener('click', function () { leaveSolo(); });
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'visible') { M.tick(); refreshBank(); refreshTable(); }
   });
@@ -719,6 +718,7 @@
     P.apply();
     if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (e) {} }
     M.tick();
+    ageCheck();
     var join = new URLSearchParams(location.search).get('join');
     show('menu');
     if (join) { go('online'); $('join-code').value = join.toUpperCase(); }
