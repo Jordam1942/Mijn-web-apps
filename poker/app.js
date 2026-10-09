@@ -284,7 +284,11 @@
     updateRaiseOut();
   }
   function closeRaise() { $('raise-row').hidden = true; $('act-row').hidden = false; }
-  function updateRaiseOut() { $('raise-out').textContent = M.fmt(raise.to); $('raise-range').value = raise.to; }
+  function updateRaiseOut() {
+    $('raise-out').textContent = M.fmt(raise.to);
+    $('raise-range').value = raise.to;
+    $('raise-ok').textContent = raise.to >= raise.max ? 'Alles op (all-in)' : 'Verhoog naar ' + M.fmt(raise.to);
+  }
 
   var timerRaf = 0, timerEnd = 0, timerLen = 0;
   function timerStart(deadline) {
@@ -376,10 +380,7 @@
       if (q === 'pot') to = cur + pot;
       if (q === 'allin') to = L.maxTo;
       raise.to = Math.max(L.minTo, Math.min(L.maxTo, to));
-      // one tap is enough: the quick buttons raise straight away
-      if (raise.to >= L.maxTo) { closeRaise(); return confirmAction({ type: 'allin' }); }
-      send({ type: 'raise', to: raise.to });
-      closeRaise();
+      updateRaiseOut();
     });
   });
 

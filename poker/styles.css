@@ -292,3 +292,10 @@ table.score td.hostbtns { text-align: left; padding-bottom: 10px; }
 .profile-prev { width: 72px; height: 72px; flex: 0 0 72px; }
 .profile-prev svg, .profile-prev img { width: 72px; height: 72px; border-radius: 50%; border: 2px solid var(--gold-lo); }
 #profile-file { max-width: 100%; }
+/* Raising: big, easy targets */
+.raise-row { padding: 10px 12px; gap: 10px; }
+.raise-row input[type="range"] { height: 40px; }
+.raise-row .quick { gap: 8px; }
+.raise-row .quick .btn { min-height: 52px; font-size: 16px; }
+.raise-row #raise-ok { min-height: 58px; font-size: 17px; }
+.raise-row .raise-cancel { min-height: 40px; padding: 4px; font-size: 14px; }
