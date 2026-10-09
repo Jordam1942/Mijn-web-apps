@@ -831,7 +831,11 @@
     if (navigator.share) navigator.share(data).catch(function () {});
     else if (navigator.clipboard) navigator.clipboard.writeText(data.url).then(function () { alert('Link gekopieerd: ' + data.url); });
   }
-  $('btn-share').addEventListener('click', function () { shareText('Speel Royal Flush Society, een pokerspel met speelgeld.'); });
+  // Share the games menu (one level up from this game), not just this game
+  $('btn-share').addEventListener('click', function () {
+    var menu = new URL('../', location.href).href;
+    shareText('Speel mee met Royal Flush Society en Toepen.', menu);
+  });
   document.addEventListener('click', function (e) {
     var g = e.target.closest('[data-go]');
     if (g) go(g.dataset.go);
