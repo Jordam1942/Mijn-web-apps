@@ -507,7 +507,17 @@
   }
   function closeTable() {
     if (!game) return show('menu');
-    if (game.kind === 'host') { game.host.stop(); if (game.db && game.db.stop) { try { game.db.stop(); } catch (e) {} } store.del(SAVE_HOST); }
+    if (game.kind === 'host') {
+      // everyone's fiches go back to their bank first; the connection stays open a moment so the message arrives
+      var h = game.host, db = game.db;
+      game = null;
+      h.table.seats.forEach(function (s, i) { if (i > 0 && s.kind === 'remote') h.kick(i); });
+      h.leaveNow();
+      store.del(SAVE_HOST);
+      setTimeout(function () { h.stop(); if (db && db.stop) { try { db.stop(); } catch (e) {} } }, 1500);
+      show('menu');
+      return;
+    }
     if (game.kind === 'guest') { game.guest.stop(); if (game.db && game.db.stop) { try { game.db.stop(); } catch (e) {} } }
     game = null;
     show('menu');

@@ -259,3 +259,14 @@ table.score .num { text-align: right; font-variant-numeric: tabular-nums; }
 table.score .pos { color: #7fe0a4; }
 table.score .neg { color: #ff9aa2; }
 table.score td.hostbtns { text-align: left; padding-bottom: 10px; }
+
+/* Chance box in the bottom right corner of the felt; your cards are big enough to read */
+.felt > .odds { position: absolute; right: 4px; bottom: 6px; width: 150px; margin: 0; z-index: 6; background: rgba(10, 8, 9, 0.8); border-color: var(--gold-lo); padding: 4px 7px; }
+.felt > .odds .odds-hand { font-size: 11px; }
+.board .card-face { width: 44px; height: 62px; }
+.seat.you .hole { left: auto; right: 62px; top: 14px; bottom: auto; transform: none; }
+.seat.you .hole .card-face { width: 46px; height: 64px; }
+@media (max-height: 760px) {
+  .board .card-face, .board .slot { width: 38px; height: 54px; }
+  .seat.you .hole .card-face { width: 42px; height: 58px; }
+}
