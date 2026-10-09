@@ -21,7 +21,7 @@
 
   // Host: runs the table and answers the others. db: PokerNet backend. o: {code, name, level, speed, turnTimer, takeover, rnd, onView(view), onLog(text)}
   function host(db, o) {
-    var code = o.code, uid = db.uid, seats = [], table, unsub = [], queuedJoins = [];
+    var code = o.code, uid = db.uid, seats = [], table, unsub = [], queuedJoins = [], leftBefore = {};
     seats.push({ id: uid, name: o.name || 'Host', kind: 'human', stack: 0, persona: 12, img: safeImg(o.img) });
     for (var k = 1; k < 8; k++) seats.push({ id: null, name: 'Vrije stoel', kind: 'empty', stack: 0 });
     table = T.create({
@@ -34,7 +34,7 @@
       },
       onCashOut: function (i, amount) {
         var s = table.seats[i];
-        if (s.id) db.set(handsPath(code, s.id), { seat: null, cashed: amount, left: true });
+        if (s.id) { leftBefore[s.id] = true; db.set(handsPath(code, s.id), { seat: null, cashed: amount, left: true }); }
         s.id = null; s.name = 'Vrije stoel'; s.kind = 'empty';
         if (i === 0 && o.onCashOut) o.onCashOut(i, amount);
       },
@@ -54,6 +54,8 @@
     function sit(req, startNow) {
       var i = seatOf(req.uid), free = -1, buy = Math.floor(Number(req.buy)), lvl = table.level;
       if (i >= 0) { db.set(handsPath(code, req.uid), { seat: i, cards: [], legal: null }); return; }
+      // no buying in again at the same table: once you have left, you can not take a new stack from your bank
+      if (leftBefore[req.uid]) { db.set(handsPath(code, req.uid), { error: 'Je kunt niet opnieuw aanschuiven aan deze tafel.' }); return; }
       if (!(buy >= lvl.min && buy <= lvl.max)) { db.set(handsPath(code, req.uid), { error: 'Instap moet tussen ' + lvl.min + ' en ' + lvl.max + ' liggen.' }); return; }
       for (var k = 1; k < 8; k++) if (table.seats[k].kind === 'empty' && free < 0) free = k;
       if (free < 0) { db.set(handsPath(code, req.uid), { error: 'De tafel is vol.' }); return; }
