@@ -182,6 +182,29 @@ test('a friend who comes back gets the same seat; a stranger does not get one', 
   assert.strictEqual(host.table.seats.filter(s => s.id === 'C').length, 0, 'Carla is toch gezet');
 });
 
+test('the host can take a friend off, or put the computer in their place', () => {
+  const net = makeNet();
+  const host = O.host(net.dbFor('H'), { code: 'kk', name: 'Host', level: { sb: 5, bb: 10, min: 200, max: 1000 }, speed: 'snel', turnTimer: 0, takeover: 0, rnd: seeded(7), later: () => ({}), cancel: () => {}, autoNext: false });
+  host.sitDown(500);
+  net.flush();
+  let anna = null, bram = null;
+  O.guest(net.dbFor('A'), 'kk', 'Anna', 400, (k, v) => { if (k === 'hands') anna = v; });
+  O.guest(net.dbFor('B'), 'kk', 'Bram', 400, (k, v) => { if (k === 'hands') bram = v; });
+  net.flush();
+  const annaSeat = host.table.seats.findIndex(s => s.id === 'A');
+  const bramSeat = host.table.seats.findIndex(s => s.id === 'B');
+  host.replace(annaSeat);
+  net.flush();
+  assert.strictEqual(host.table.seats[annaSeat].kind, 'bot', 'Anna is niet vervangen');
+  assert.strictEqual(anna && anna.left && anna.replaced, true, 'Anna is niet op de hoogte gebracht');
+  // Bram joined while a hand was running: she waits in the queue, so nothing happens to her seat yet
+  assert.strictEqual(bramSeat, -1, 'Bram zou nog niet zitten');
+  host.kick(bramSeat);
+  net.flush();
+  assert.strictEqual(host.table.seats[annaSeat].kind, 'bot', 'Anna\'s stoel is veranderd door het weghalen van een ander');
+  assert.strictEqual(bram, null, 'Bram kreeg onterecht een pakket');
+});
+
 let failed = 0;
 for (const [name, fn] of tests) {
   try { fn(); console.log('ok  ' + name); }

@@ -464,7 +464,7 @@
   }
   $('btn-resume-host').addEventListener('click', function () {
     var saved = store.get(SAVE_HOST);
-    if (saved) openAsHost(saved.code, saved.name, saved.level, 0, true);
+    if (saved) openAsHost(saved.code, saved.name, saved.level, 0, true, saved.blindEvery || 0);
   });
   $('btn-resume-guest').addEventListener('click', function () {
     var mine = store.get(MINE);
@@ -476,15 +476,15 @@
     if (!(buy >= L.min && buy <= L.max)) return status('online-status', 'De instap moet tussen ' + M.fmt(L.min) + ' en ' + M.fmt(L.max) + ' liggen.');
     if (!M.take(buy)) return status('online-status', 'Je bank is te laag voor deze instap.');
     var code = randomCode();
-    openAsHost(code, name, L, buy, false);
+    openAsHost(code, name, L, buy, false, $('host-blinds').checked ? 10 : 0);
   });
-  function openAsHost(code, name, L, buy, resume) {
+  function openAsHost(code, name, L, buy, resume, blindEvery) {
     status('online-status', 'Tafel openen…');
     var db = NET.peer();
     db.openHost(code, { resume: resume }).then(function () {
       game = { kind: 'host', code: code, db: db, level: L };
       game.host = ON.host(db, {
-        code: code, name: name, level: L, img: loadAvatar(), speed: P.get().speed, turnTimer: P.get().turnTimer, takeover: P.get().takeover,
+        code: code, name: name, level: L, img: loadAvatar(), blindEvery: blindEvery || 0, nextLevel: nextLevel, speed: P.get().speed, turnTimer: P.get().turnTimer, takeover: P.get().takeover,
         onView: function (view) { renderTable(view); saveHost(); },
         onSound: function (k) { sound(k); },
         onLog: function (text) { msg(text); },
@@ -492,13 +492,13 @@
       });
       if (resume && store.get(SAVE_HOST)) game.host.restore(store.get(SAVE_HOST).snap);
       else game.host.sitDown(buy);
-      store.set(SAVE_HOST, { code: code, name: name, level: L, snap: game.host.snapshot() });
+      store.set(SAVE_HOST, { code: code, name: name, level: L, blindEvery: blindEvery || 0, snap: game.host.snapshot() });
       show('table');
       showInvite(code);
       refreshTable();
     }).catch(function (e) { M.give(buy); status('online-status', e.message || 'Tafel openen mislukt.'); });
   }
-  function saveHost() { if (game && game.kind === 'host') store.set(SAVE_HOST, { code: game.code, name: game.host.table.seats[0].name, level: game.level, snap: game.host.snapshot() }); }
+  function saveHost() { if (game && game.kind === 'host') { var old = store.get(SAVE_HOST) || {}; store.set(SAVE_HOST, { code: game.code, name: game.host.table.seats[0].name, level: game.level, blindEvery: old.blindEvery || 0, snap: game.host.snapshot() }); } }
   function showInvite(code) {
     var url = joinUrl(code);
     var qr = qrSvg(url, 6);
@@ -548,7 +548,15 @@
           return;
         }
         if (data.error) { if (!rejoin) { M.give(buy); store.del(PENDING); store.del(MINE); } msg(data.error); return; }
-        if (data.cashed && !game.cashed) { game.cashed = true; M.give(data.cashed); closeTable(); return; }
+        if (data.left && !game.cashed) {
+          game.cashed = true;
+          if (data.cashed) M.give(data.cashed);
+          store.del(MINE);
+          closeTable();
+          show('online');
+          status('online-status', data.replaced ? 'De host heeft je van tafel gehaald. De computer neemt je plek over.' : 'Je bent van de tafel. Je fiches zijn teruggegeven.');
+          return;
+        }
         refreshTable();
       }
       if (kind === 'chat') addChat(data);
@@ -577,6 +585,14 @@
     }).catch(function () {});
   }
 
+  // The host's buttons in the scoreboard
+  $('sheet-body').addEventListener('click', function (e) {
+    if (!game || game.kind !== 'host') return;
+    var k = e.target.closest('[data-kick]'), b = e.target.closest('[data-bot]');
+    if (k) confirmThen(k.dataset.name + ' van de tafel halen? De fiches gaan terug naar hun bank.', function () { game.host.kick(+k.dataset.kick); });
+    if (b) confirmThen(b.dataset.name + ' vervangen door de computer? De stapel blijft aan tafel.', function () { game.host.replace(+b.dataset.bot); });
+  });
+
   // ---- Chat ----------------------------------------------------------------------
   var chatLines = [];
   var muted = {};
@@ -595,8 +611,11 @@
   // Scoreboard: fiches now, result for this session, rounds played and won
   function signed(n) { return (n > 0 ? '+' : '') + M.fmt(n); }
   $('t-score').addEventListener('click', function () {
+    var isHost = game && game.kind === 'host';
     var rows = lastScore.map(function (r) {
-      return '<tr><td>' + esc(r.name) + '</td><td class="num">' + M.fmt(r.now) + '</td><td class="num ' + (r.net >= 0 ? 'pos' : 'neg') + '">' + signed(r.net) + '</td><td class="num">' + r.hands + '</td><td class="num">' + r.won + '</td></tr>';
+      var line = '<tr><td>' + esc(r.name) + '</td><td class="num">' + M.fmt(r.now) + '</td><td class="num ' + (r.net >= 0 ? 'pos' : 'neg') + '">' + signed(r.net) + '</td><td class="num">' + r.hands + '</td><td class="num">' + r.won + '</td></tr>';
+      if (isHost && r.kind === 'remote') line += '<tr><td colspan="5" class="hostbtns"><button class="btn small" data-kick="' + r.i + '" data-name="' + esc(r.name) + '">Van tafel halen</button> <button class="btn small" data-bot="' + r.i + '" data-name="' + esc(r.name) + '">Vervang door computer</button></td></tr>';
+      return line;
     }).join('');
     sheet('<h2>Scorebord</h2>' +
       (rows ? '<table class="score"><tr><th>Speler</th><th>Fiches</th><th>Winst</th><th>Ronden</th><th>Gewonnen</th></tr>' + rows + '</table>' : '<p>Nog geen ronden gespeeld.</p>') +

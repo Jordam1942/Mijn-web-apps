@@ -169,7 +169,7 @@
         var sc = T.score[i];
         if (!sc) return null;
         var now = s.kind === 'empty' ? 0 : s.stack;
-        return { i: i, name: s.name, now: now, net: now + sc.out - sc.inn - sc.start, hands: sc.hands, won: sc.won };
+        return { i: i, name: s.name, kind: s.kind, now: now, net: now + sc.out - sc.inn - sc.start, hands: sc.hands, won: sc.won };
       }).filter(function (r) { return r; });
     }
 
@@ -294,6 +294,15 @@
     T.act = act;
     T.leave = leave;
     T.leaveNow = leaveNow;
+    T.kick = leaveNow;                 // the host takes a friend off the table: stack back now
+    // the host swaps a friend for a computer player; it keeps the seat and the stack
+    T.replaceWithBot = function (i) {
+      var s = T.seats[i];
+      if (s.kind === 'empty' || s.kind === 'bot') return;
+      s.kind = 'bot'; s.style = 'gemiddeld'; s.leaving = false;
+      note(s.name + ' wordt vervangen door de computer.');
+      sync(); publish(); scheduleTurn();
+    };
     T.view = view;
     T.publish = publish;
     T.snapshot = snapshot;

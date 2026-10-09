@@ -70,7 +70,7 @@
       <div class="row between"><span>Computerspelers</span><strong id="bots-out">3</strong></div>
       <input type="range" id="bots" min="1" max="7" value="3" aria-label="Aantal computerspelers">
     </div>
-    <label class="check buyin"><input type="checkbox" id="blinds-up"> Blinds lopen op (elke 10 ronden, toernooi)</label>
+    <label class="check buyin"><input type="checkbox" id="blinds-up" checked> Blinds lopen op (elke 10 ronden, toernooi)</label>
     <button class="btn gold big" id="btn-deal">Aanschuiven</button>
   </div>
 </section>
@@ -141,6 +141,7 @@
       <label class="field">Je naam <input id="host-name" maxlength="14" value="Jij"></label>
       <label class="field">Instap <input id="host-buy" type="number" step="100" value="1000"></label>
       <label class="field">Niveau <select id="host-level"></select></label>
+      <label class="check"><input type="checkbox" id="host-blinds" checked> Blinds lopen op (elke 10 ronden)</label>
       <button class="btn gold big" id="btn-host">Open de tafel</button>
     </div>
     <div class="card-panel">

@@ -26,6 +26,7 @@
     for (var k = 1; k < 8; k++) seats.push({ id: null, name: 'Vrije stoel', kind: 'empty', stack: 0 });
     table = T.create({
       level: o.level, seats: seats, speed: o.speed, turnTimer: o.turnTimer, takeover: o.takeover, rnd: o.rnd, later: o.later, cancel: o.cancel, autoNext: o.autoNext,
+      blindEvery: o.blindEvery, nextLevel: o.nextLevel,
       onChange: function (i, view) {
         if (i === null) { db.set(base(code) + '/pub', view); return; }
         var s = table.seats[i];
@@ -88,6 +89,14 @@
       table: table,
       // The host's own moves
       act: function (action) { return table.act(0, action); },
+      // The host takes a friend off the table (the stack goes back to them now).
+      kick: function (i) { if (i > 0 && table.seats[i] && table.seats[i].kind !== 'empty') table.kick(i); },
+      // The host puts the computer in the friend's place. The friend is told, and their stack stays at the table.
+      replace: function (i) {
+        var old = table.seats[i].id;
+        table.replaceWithBot(i);
+        if (old) { table.seats[i].id = null; db.set(handsPath(code, old), { seat: null, cashed: 0, left: true, replaced: true }); }
+      },
       // Sit down at the table yourself with this many fiches (the hand starts when two can play).
       sitDown: function (buy) { table.seats[0].stack = buy; table.startHand(); },
       leave: function () { table.leave(0); },
@@ -104,7 +113,7 @@
     var uid = db.uid, unsub = [], me = { seat: null, cards: [], legal: null, error: null };
     unsub.push(db.on(handsPath(code, uid), function (p) {
       if (!p) return;
-      me = { seat: p.seat, cards: p.cards || [], legal: p.legal || null, deadline: p.deadline || 0, error: p.error || null, code: p.code || null, cashed: p.cashed };
+      me = { seat: p.seat, cards: p.cards || [], legal: p.legal || null, deadline: p.deadline || 0, error: p.error || null, code: p.code || null, cashed: p.cashed, left: !!p.left, replaced: !!p.replaced };
       if (cb) cb('hands', me);
     }));
     unsub.push(db.on(base(code) + '/pub', function (pub) { if (cb) cb('pub', pub); }));
