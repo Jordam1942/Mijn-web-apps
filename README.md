@@ -5,7 +5,7 @@ Mijn webapps, elk in een eigen map.
 | App | Map | Wat is het |
 |---|---|---|
 | Toepen | [`toepen/`](toepen/) | Kaartspel: alleen spelen, multiplayer (PeerJS en QR-ring) en een scorebord. Werkt als app op je telefoon (PWA). |
-| Royal Flush Society | [`poker/`](poker/) | Texas Hold'em met speelgeld (18+): tegen de computer, met vrienden op afstand of in dezelfde kamer, en een fichetelling. Werkt als app op je telefoon (PWA). |
+| Royal Flush Society | [`poker/`](poker/) | Texas Hold'em met speelgeld: tegen de computer, met vrienden op afstand of in dezelfde kamer, en een fichetelling. Werkt als app op je telefoon (PWA). |
 
 ## Toepen op GitHub Pages
 

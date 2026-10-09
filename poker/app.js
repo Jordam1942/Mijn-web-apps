@@ -73,14 +73,6 @@
   }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
-  // ---- Warning at the start (once) ----
-  function ageCheck() {
-    if (store.get('poker-age-ok')) return;
-    $('s-age').hidden = false;
-    $('age-ok').addEventListener('change', function () { $('age-go').disabled = !this.checked; });
-    $('age-go').addEventListener('click', function () { store.set('poker-age-ok', true); $('s-age').hidden = true; });
-  }
-
   // ---- Setup -----------------------------------------------------------------
   var setup = { level: null };
   function renderSetup() {
@@ -852,7 +844,6 @@
     P.apply();
     if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (e) {} }
     M.tick();
-    ageCheck();
     checkPending();
     var join = new URLSearchParams(location.search).get('join');
     show('menu');
