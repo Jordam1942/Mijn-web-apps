@@ -54,11 +54,16 @@
     { name: 'Jolien', hair: '#d8b06a', skin: '#fbd9bd', top: '#7a1420', style: 'long', brow: '#b08a4a', eyes: '#4a7a9a' },
     { name: 'Koen', hair: '#2b2b2b', skin: '#b87b52', top: '#34465a', style: 'short', beard: true, brow: '#2b2b2b', eyes: '#2a2018', suit: true },
     { name: 'Lotte', hair: '#5a2e1d', skin: '#f6d2b4', top: '#4a3a6b', style: 'bun', brow: '#5a2e1d', eyes: '#3a5a3a' },
-    { name: 'Jij', hair: '#6b4a2b', skin: '#f6d7bc', top: '#2b3a4a', style: 'short', brow: '#6b4a2b', eyes: '#3d6b8a', suit: true }
+    { name: 'Jij', hair: '#6b4a2b', skin: '#f6d7bc', top: '#2b3a4a', style: 'short', brow: '#6b4a2b', eyes: '#3d6b8a', suit: true },
+    // new: with glasses. Added at the end, so the numbers of the others stay the same.
+    { name: 'Sanne', hair: '#7a4a2a', skin: '#f5d6bc', top: '#8a2b3b', style: 'long', glasses: true, brow: '#7a4a2a', eyes: '#3d6b8a' },
+    { name: 'Mark', hair: '#4a3525', skin: '#f1cba9', top: '#2b3b4a', style: 'short', glasses: true, brow: '#4a3525', eyes: '#4a6a4a', suit: true },
+    { name: 'Kwame', hair: '#141414', skin: '#7a4a2c', top: '#3a4a2b', style: 'short', glasses: true, brow: '#141414', eyes: '#2a1a10', suit: true },
+    { name: 'Amara', hair: '#1a1a1a', skin: '#8a5232', top: '#5a2a4a', style: 'bun', glasses: true, brow: '#1a1a1a', eyes: '#2a1a10' }
   ];
-  var YOU = PERSONAS.length - 1;   // your own character (the computer players never get it)
-  // the ten you can choose from in the settings: women and younger faces, plus your own character
-  var PRESETS = [0, 2, 3, 4, 5, 7, 8, 9, 11, YOU];
+  var YOU = 12;   // your own character (the computer players never get it)
+  // the ones you can choose from in your profile: women and men, with and without glasses, plus yourself
+  var PRESETS = [0, 2, 3, 4, 5, 7, 8, 9, 11, YOU, 13, 14, 15, 16];
 
   // A portrait for the character with this index (0..11, wraps around).
   function avatar(i) {
