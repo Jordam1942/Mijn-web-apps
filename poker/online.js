@@ -37,6 +37,13 @@
         if (i === 0 && o.onCashOut) o.onCashOut(i, amount);
       },
       onLog: function (text) { if (o.onLog) o.onLog(text); },
+      onSound: function (kind) {
+        if (o.onSound) o.onSound(kind);
+        // the friends hear the same sound: it is put in the table for a few seconds, then taken out again
+        db.push(base(code) + '/sfx', { k: kind, at: Date.now() }).then(function (r) {
+          if (r && r.key) setTimeout(function () { db.remove(base(code) + '/sfx/' + r.key); }, 4000);
+        });
+      },
       // Joins that arrived during a hand sit down when it is over (before the next deal).
       beforeHand: function () { while (queuedJoins.length) sit(queuedJoins.shift(), false); }
     });
@@ -91,6 +98,10 @@
     }));
     unsub.push(db.on(base(code) + '/pub', function (pub) { if (cb) cb('pub', pub); }));
     unsub.push(db.onChildAdded(base(code) + '/chat', function (key, msg) { if (cb) cb('chat', msg); }));
+    unsub.push(db.onChildAdded(base(code) + '/sfx', function (key, msg) {
+      // only sounds from the last few seconds: older ones are still there when you join
+      if (msg && cb && Date.now() - msg.at < 4000) cb('sfx', msg.k);
+    }));
     db.push(base(code) + '/join', { uid: uid, name: name, buy: buy });
     return {
       me: function () { return me; },

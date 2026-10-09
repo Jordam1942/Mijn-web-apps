@@ -71,6 +71,28 @@ async function run() {
     await ctx.close();
     console.log('ok  opgeslagen tafel komt terug, zonder verborgen kaarten');
 
+    // Every game sound is audible and does not clip (rendered offline, so no speakers are needed)
+    const page2 = await (await browser.newContext()).newPage();
+    page2.on('pageerror', e => errors.push(e.message));
+    await page2.goto(base, { waitUntil: 'load' });
+    const sounds = await page2.evaluate(async () => {
+      const out = {};
+      for (const kind of window.PokerSfx.names) {
+        const c = new OfflineAudioContext(1, 44100 * 2.5, 44100);
+        window.PokerSfx.schedule(c, kind, 0);
+        const buf = await c.startRendering();
+        const d = buf.getChannelData(0);
+        let peak = 0, sum = 0;
+        for (let i = 0; i < d.length; i++) { const v = Math.abs(d[i]); if (v > peak) peak = v; sum += d[i] * d[i]; }
+        out[kind] = { peak: +peak.toFixed(3), rms: +Math.sqrt(sum / d.length).toFixed(5) };
+      }
+      return out;
+    });
+    for (const [kind, s] of Object.entries(sounds)) {
+      assert.ok(s.rms > 0.0005, 'geluid "' + kind + '" is stil');
+      assert.ok(s.peak <= 1.0, 'geluid "' + kind + '" vervormt');
+    }
+    console.log('ok  alle geluiden hoorbaar en niet vervormd: ' + Object.keys(sounds).join(', '));
     assert.deepStrictEqual(errors, [], 'fouten in de pagina');
     console.log('ok  geen fouten in de pagina');
   } finally {

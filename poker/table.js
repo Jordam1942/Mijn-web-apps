@@ -35,6 +35,8 @@
     };
     var timer = null, pauseTimer = null;
 
+    // Sound events for the table (the screen or the network plays them).
+    function sfx(kind) { if (cfg.onSound) cfg.onSound(kind); }
     function note(text) {
       T.log.push(text);
       if (T.log.length > 40) T.log.shift();
@@ -87,6 +89,7 @@
       T.dealer = T.hand.dealer;
       T.handCount++;
       sync();
+      sfx('deal');
       note('Nieuwe ronde. ' + seatName(T.hand.dealer) + ' is de knop.');
       publish();
       scheduleTurn();
@@ -134,8 +137,11 @@
       if (!T.hand || T.hand.done) return { ok: false, error: 'Er is geen ronde bezig.' };
       if (T.hand.current !== i) return { ok: false, error: 'Het is niet jouw beurt.' };
       stopTimer();
+      var stageBefore = T.hand.stage;
       res = E.act(T.hand, i, action);
       if (!res.ok) { if (T.seats[i].kind === 'bot') return apply(i, { type: 'fold' }); scheduleTurn(); return res; }
+      sfx(action.type === 'fold' ? 'fold' : action.type === 'check' ? 'check' : action.type === 'call' ? 'call' : T.hand.players[i].allIn ? 'allin' : 'raise');
+      if (!T.hand.done && T.hand.stage !== stageBefore) sfx('street');
       note(describeAction(i, { type: action.type, to: T.hand.players[i].bet }));
       sync();
       if (T.hand.done) return finishHand(res);
@@ -147,6 +153,7 @@
 
     function finishHand(res) {
       var lines = E.summary(T.hand);
+      sfx('win');
       lines.forEach(note);
       if (T.hand.board.length) note('Bord: ' + T.hand.board.map(E.cardLabel).join(' '));
       T.seats.forEach(function (s, i) { if (s.leaving && s.kind !== 'empty') cashOut(i); });

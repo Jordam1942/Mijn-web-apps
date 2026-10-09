@@ -137,7 +137,8 @@
         if (game && game.leaving) { exitSolo(); }
       },
       onLog: function (text) { if (game && game.kind === 'solo') msg(text); },
-      onTurn: function (i) { if (i === 0) { sound('turn'); buzz(40); } }
+      onSound: function (k) { sound(k); },
+      onTurn: function (i) { if (i === 0) buzz(40); }
     };
   }
   function startSolo(L, buy, bots) {
@@ -253,7 +254,6 @@
     // Winners banner
     if (v.done && v.result && v.result.length) {
       $('seats').insertAdjacentHTML('beforeend', '<div class="winner-banner">' + esc(v.result.join(' · ')) + '</div>');
-      if (P.fx('fxWin')) sound('win');
     }
     if (v.log && v.log.length) msg(v.log[v.log.length - 1]);
     renderOdds(v);
@@ -355,11 +355,10 @@
     if (game.kind === 'solo') {
       var before = game.table.fullSnapshot();
       var res = game.table.act(0, action);
-      if (!res.ok) { msg(res.error); return; }
+      if (!res.ok) { msg(res.error); sound('error'); return; }
       game.undo = before;
       $('b-undo').hidden = !(before && P.get().undo);
       saveSolo();
-      sound('tick');
     } else if (game.kind === 'host') {
       var r = game.host.act(action);
       if (r && !r.ok) msg(r.error);
@@ -458,6 +457,7 @@
       game.host = ON.host(db, {
         code: code, name: name, level: L, speed: P.get().speed, turnTimer: P.get().turnTimer, takeover: P.get().takeover,
         onView: function (view) { renderTable(view); saveHost(); },
+        onSound: function (k) { sound(k); },
         onLog: function (text) { msg(text); },
         onCashOut: function (i, amount) { if (amount > 0) M.give(amount); }
       });
@@ -510,6 +510,7 @@
         refreshTable();
       }
       if (kind === 'chat') addChat(data);
+      if (kind === 'sfx') sound(data);
     });
     show('table');
     msg('Je wacht tot de volgende ronde begint…');
@@ -586,6 +587,7 @@
       code: ROOM_CODE, name: name, level: L, speed: P.get().speed, turnTimer: P.get().turnTimer, takeover: P.get().takeover,
       onView: function (view) { renderTable(view); },
       onLog: function (text) { msg(text); },
+      onSound: function (k) { sound(k); },
       onCashOut: function (i, amount) { if (amount > 0) M.give(amount); }
     });
     game.host.sitDown(buy);
