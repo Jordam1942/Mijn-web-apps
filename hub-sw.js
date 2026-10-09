@@ -1,7 +1,7 @@
 // The menu app: keeps the menu page and its icons for offline use. The games have their own
 // service workers, so requests for them go straight to the network here.
 var CACHE = 'hub-v1';
-var FILES = ['./', 'index.html', 'hub.webmanifest', 'poker/icons/icon-192.png', 'poker/icons/icon-512.png', 'poker/icons/icon.svg', 'toepen/icons/icon-192.png'];
+var FILES = ['./', 'index.html', 'hub.webmanifest', 'icons/spellen-192.png', 'icons/spellen-512.png', 'icons/spellen.svg', 'poker/icons/icon-192.png', 'toepen/icons/icon-192.png'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(FILES.map(function (f) { return c.add(f).catch(function () {}); })); }));
