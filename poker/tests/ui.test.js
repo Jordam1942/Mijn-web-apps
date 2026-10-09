@@ -31,6 +31,8 @@ async function run() {
       await page.evaluate(() => { const r = document.getElementById('bots'); r.value = 7; r.dispatchEvent(new Event('input', { bubbles: true })); });
       await page.click('#btn-deal');
       await page.waitForTimeout(600);
+      const atStart = await page.evaluate(() => document.querySelectorAll('#s-table .seat').length);
+      assert.strictEqual(atStart, 8, 'acht spelers verwacht aan het begin');
       for (let k = 0; k < 30; k++) {
         await page.waitForTimeout(200);
         if (await page.evaluate(() => !document.getElementById('b-call').disabled)) await page.click('#b-call');
@@ -46,7 +48,6 @@ async function run() {
       });
       assert.deepStrictEqual(fit.bad, [], 'elementen buiten het scherm bij ' + h);
       assert.strictEqual(fit.scrolls, false, 'de pagina scrolt bij ' + h);
-      assert.strictEqual(fit.seats, 8, 'acht spelers verwacht');
       await ctx.close();
       console.log('ok  acht spelers passen op 412 x ' + h + ' zonder scrollen');
     }

@@ -25,6 +25,7 @@
       }),
       dealer: cfg.dealer || 0,
       handCount: 0,
+      score: {},             // per seat: start, money put in again (in), cashed out (out), hands, hands won
       hand: null,
       rebought: 0,           // fiches the computer players bought in again (new money on the table)
       log: [],
@@ -80,7 +81,7 @@
       T.seats.forEach(function (s) {
         // a computer player with too few fiches: buys in again (if that is switched on) or leaves the table
         if (s.kind === 'bot' && s.stack < bb) {
-          if (cfg.botRebuy) { T.rebought += T.level.min - s.stack; s.stack = T.level.min; note(s.name + ' koopt weer in'); }
+          if (cfg.botRebuy) { T.rebought += T.level.min - s.stack; recordIn(i, T.level.min - s.stack); s.stack = T.level.min; note(s.name + ' koopt weer in'); }
           else { s.kind = 'empty'; s.stack = 0; note(s.name + ' gaat van tafel.'); }
         }
       });
@@ -93,6 +94,11 @@
       T.dealer = T.hand.dealer;
       T.handCount++;
       sync();
+      T.seats.forEach(function (s, i) {
+        if (T.hand.players[i].out) return;
+        var sc = T.score[i] || (T.score[i] = { start: T.hand.players[i].stack, inn: 0, out: 0, hands: 0, won: 0 });
+        sc.hands++;
+      });
       sfx('deal');
       note('Nieuwe ronde. ' + seatName(T.hand.dealer) + ' is de knop.');
       publish();
@@ -155,8 +161,22 @@
     }
     function act(i, action) { return apply(i, action); }
 
+    function recordIn(i, amount) { var sc = T.score[i] || (T.score[i] = { start: 0, inn: 0, out: 0, hands: 0, won: 0 }); sc.inn += amount; }
+    function recordOut(i, amount) { var sc = T.score[i] || (T.score[i] = { start: 0, inn: 0, out: 0, hands: 0, won: 0 }); sc.out += amount; }
+    // Per seat: what they have now, and their result for this session (money out + now - money in - start)
+    function scoreRows() {
+      return T.seats.map(function (s, i) {
+        var sc = T.score[i];
+        if (!sc) return null;
+        var now = s.kind === 'empty' ? 0 : s.stack;
+        return { i: i, name: s.name, now: now, net: now + sc.out - sc.inn - sc.start, hands: sc.hands, won: sc.won };
+      }).filter(function (r) { return r; });
+    }
+
     function finishHand(res) {
       var lines = E.summary(T.hand);
+      T.hand.awards.map(function (a) { return a.idx; }).filter(function (x, k, arr) { return arr.indexOf(x) === k && T.hand.awards.some(function (a) { return a.idx === x && a.amount > 0; }); })
+        .forEach(function (i) { if (T.score[i]) T.score[i].won++; });
       sfx('win');
       lines.forEach(note);
       if (T.hand.board.length) note('Bord: ' + T.hand.board.map(E.cardLabel).join(' '));
@@ -188,6 +208,7 @@
       if (hp) hp.stack = 0;
       if (T.hand) T.hand.startTotal -= amount;   // these chips have left the table: the hand's total goes down
       s.kind = 'empty'; s.stack = 0; s.leaving = false;
+      recordOut(i, amount);
       if (cfg.onCashOut) cfg.onCashOut(i, amount);
       if (T.hand && T.hand.done) finishHand();
       else { publish(); scheduleTurn(); }
@@ -196,6 +217,7 @@
       var s = T.seats[i], amount = s.stack;
       if (T.hand && !T.hand.done) return;   // the chips stay in the pot until the hand is over
       s.kind = 'empty'; s.stack = 0; s.leaving = false;
+      recordOut(i, amount);
       if (cfg.onCashOut) cfg.onCashOut(i, amount);
     }
 
@@ -223,7 +245,7 @@
         winners: h && h.done ? h.awards.map(function (a) { return a.idx; }).filter(function (x, k, arr) { return arr.indexOf(x) === k; }) : [],
         board: h ? h.board.slice() : [], pot: h ? h.players.reduce(function (a, p) { return a + p.total; }, 0) : 0,
         seats: seats, you: v, legal: (h && v !== null && h.current === v && !h.done) ? E.legal(h, v) : null,
-        deadline: T.turnDeadline, log: T.log.slice(-8), done: !!(h && h.done),
+        deadline: T.turnDeadline, log: T.log.slice(-8), done: !!(h && h.done), score: scoreRows(),
         result: h && h.done ? E.summary(h) : null,
         showdown: h && h.done ? h.showdown.map(function (x) { return { idx: x.idx, name: T.seats[x.idx].name, text: E.describe(x.ev), cards: x.cards }; }) : []
       };

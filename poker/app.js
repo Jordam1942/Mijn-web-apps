@@ -13,7 +13,7 @@
   var ROOM_CODE = 'kamer';
   var game = null;          // {kind:'solo'|'host'|'guest', table?, host?, guest?, db?, code?, pub?, me?, undo?}
   var oddsCache = { key: '', value: null };
-  var lastTurn = false, wakeLock = null;
+  var lastTurn = false, wakeLock = null, lastScore = [];
   var store = {
     get: function (k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
     set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
@@ -238,6 +238,7 @@
     if (v.done && v.result && v.result.length) {
       $('seats').insertAdjacentHTML('beforeend', '<div class="winner-banner">' + esc(v.result.join(' · ')) + '</div>');
     }
+    lastScore = v.score || [];
     if (v.log && v.log.length) msg(v.log[v.log.length - 1]);
     renderOdds(v);
     renderActions(v);
@@ -544,6 +545,17 @@
     sheet(html, [{ label: 'Klaar', cls: 'gold' }]);
     document.querySelectorAll('[data-mute]').forEach(function (cb) { cb.addEventListener('change', function () { muted[cb.dataset.mute] = cb.checked; chatLines = chatLines.filter(function (m) { return !muted[m.name]; }); }); });
   }
+  // Scoreboard: fiches now, result for this session, rounds played and won
+  function signed(n) { return (n > 0 ? '+' : '') + M.fmt(n); }
+  $('t-score').addEventListener('click', function () {
+    var rows = lastScore.map(function (r) {
+      return '<tr><td>' + esc(r.name) + '</td><td class="num">' + M.fmt(r.now) + '</td><td class="num ' + (r.net >= 0 ? 'pos' : 'neg') + '">' + signed(r.net) + '</td><td class="num">' + r.hands + '</td><td class="num">' + r.won + '</td></tr>';
+    }).join('');
+    sheet('<h2>Scorebord</h2>' +
+      (rows ? '<table class="score"><tr><th>Speler</th><th>Fiches</th><th>Winst</th><th>Ronden</th><th>Gewonnen</th></tr>' + rows + '</table>' : '<p>Nog geen ronden gespeeld.</p>') +
+      '<p class="fine">Winst is wat je nu hebt, plus wat je eruit hebt gehaald, min wat je erin hebt gestopt.</p>',
+      [{ label: 'Sluiten', cls: 'ghost' }]);
+  });
   $('t-chat').addEventListener('click', function () {
     sheet('<h2>Chat</h2><div class="chat-log" id="chat-log"></div><input id="chat-in" maxlength="200" placeholder="Schrijf iets…" class="chat-in">',
       [{ label: 'Dempen', cls: 'ghost', fn: muteMenu }, { label: 'Stuur', cls: 'gold', fn: function () {
