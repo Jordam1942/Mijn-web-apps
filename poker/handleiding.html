@@ -30,7 +30,11 @@
   .seat-plan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .seat-plan div { text-align: center; padding: 10px 6px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); font-size: 13.5px; }
   .seat-plan b { display: block; font-family: var(--serif); font-size: 18px; color: var(--gold-hi); }
-  .odds-demo { display: flex; flex-direction: column; gap: 6px; }
+  .odds-demo { display: flex; justify-content: center; }
+  .odds-vertical { width: 46px; height: 130px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px; border: 1px solid var(--gold-lo); border-radius: 12px; background: var(--panel); }
+  .odds-vertical strong { font-family: var(--serif); font-size: 14px; color: var(--gold-hi); }
+  .odds-vertical .vbar { position: relative; flex: 1; width: 14px; border-radius: 7px; background: rgba(122,20,36,.7); overflow: hidden; }
+  .odds-vertical .vbar span { position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(#f0cf7a, #b98b33); }
   .odds-demo .odds-bar { height: 14px; }
   .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--ink-soft); }
   .legend span::before { content: ''; display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
@@ -105,13 +109,12 @@
 
   <section class="step">
     <div class="num">8 · De kanskaart</div>
-    <p>Naast je hand zie je hoe groot de kans is dat je de ronde wint, als de kaarten nog onbekend waren. Het getal verandert elke straat.</p>
+    <p>Rechts onderin de tafel zie je een smalle balk met een percentage. Dat is de kans dat jij deze ronde wint, met de kaarten die je nu ziet. De balk vult van onder naar boven: hoe hoger, hoe beter je kaarten.</p>
     <div class="odds-demo">
-      <div class="odds-top"><span>Kans om te winnen</span><strong>62%</strong></div>
-      <div class="odds-bar"><span style="width:55%;background:linear-gradient(90deg,#d2a94f,#f0cf7a)"></span><span style="width:14%;background:#7d8ea3"></span><span style="width:31%;background:#7a1424"></span></div>
-      <div class="legend"><span class="w">Winnen</span><span class="t">Gelijk</span><span class="l">Verliezen</span></div>
+      <div class="odds-vertical"><strong>62%</strong><div class="vbar"><span style="height:62%"></span></div></div>
     </div>
-    <p class="fine">De kans is een schatting: de app deelt de onbekende kaarten duizenden keren op een willekeurige manier en telt wie wint. Het is een hulp, geen garantie.</p>
+    <p>Het percentage verandert elke straat, want er komen nieuwe kaarten op tafel. Zonder tekst, zodat je tafel leesbaar blijft.</p>
+    <p class="fine">De kans is een schatting: de app deelt de onbekende kaarten duizenden keren op een willekeurige manier en telt hoe vaak je wint. Het is een hulp, geen garantie.</p>
   </section>
 
   <section class="step">
