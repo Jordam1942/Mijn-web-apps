@@ -78,7 +78,11 @@
         if (s.leaving && s.kind !== 'empty') cashOut(i);
       });
       T.seats.forEach(function (s) {
-        if (s.kind === 'bot' && s.stack < bb) { T.rebought += T.level.min - s.stack; s.stack = T.level.min; note(s.name + ' koopt weer in'); }
+        // a computer player with too few fiches: buys in again (if that is switched on) or leaves the table
+        if (s.kind === 'bot' && s.stack < bb) {
+          if (cfg.botRebuy) { T.rebought += T.level.min - s.stack; s.stack = T.level.min; note(s.name + ' koopt weer in'); }
+          else { s.kind = 'empty'; s.stack = 0; note(s.name + ' gaat van tafel.'); }
+        }
       });
       active = T.seats.filter(function (s) { return s.kind !== 'empty' && s.stack > 0; });
       if (active.length < 2) { T.hand = null; stopTimer(); publish(); return; }

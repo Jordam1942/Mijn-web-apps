@@ -223,10 +223,10 @@ input[type="range"] { width: 100%; accent-color: var(--gold); height: 32px; }
 }
 
 /* Menu: fits short and tall phones without scrolling (the last row is never cut off) */
-.menu { overflow-y: auto; justify-content: flex-start; padding-bottom: calc(40px + var(--safe-b)); }
+.menu { overflow-y: auto; justify-content: flex-start; padding-bottom: calc(72px + var(--safe-b)); }
 .menu > .row { margin-top: 10px; }
 @media (max-height: 940px) {
-  .menu { gap: 10px; padding: 12px 16px 40px; }
+  .menu { gap: 10px; padding: 12px 16px 72px; }
   .brand h1 { font-size: 25px; }
   .tag { margin-top: 2px; }
   .crest { width: 44px; height: 44px; font-size: 24px; }

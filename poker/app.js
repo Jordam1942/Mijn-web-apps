@@ -129,7 +129,7 @@
   function soloOptions(L) {
     var p = P.get();
     return {
-      level: L, speed: p.speed, turnTimer: 0, takeover: 0,   // offline: no timer, you take all the time you want
+      level: L, speed: p.speed, turnTimer: 0, takeover: 0, botRebuy: p.botRebuy,   // offline: no timer, you take all the time you want
       onChange: function (i, view) { if (i === 0 && game && game.kind === 'solo') { renderTable(view); saveSolo(); } },
       onCashOut: function (i, amount) {
         if (i !== 0) return;
@@ -694,7 +694,7 @@
   var TOGGLES = [
     ['sound', 'Geluid'], ['vibrate', 'Trillen'], ['wake', 'Scherm aan aan tafel'],
     ['gfx', 'Animaties aan'], ['fxDeal', 'Kaarten uitdelen'], ['fxChips', 'Fiches naar de pot'], ['fxWin', 'Winnaar oplichten'],
-    ['confirmAllIn', 'Vragen bij all-in'], ['confirmFold', 'Vragen bij passen als je mag checken'],
+    ['confirmAllIn', 'Vragen bij all-in'], ['confirmFold', 'Vragen bij passen als je mag checken'], ['botRebuy', 'Computerspelers kopen weer in als ze op zijn'],
     ['undo', 'Knop "Ongedaan maken" (solo)'], ['odds', 'Kanskaart naast je hand']
   ];
   function renderSettings() {

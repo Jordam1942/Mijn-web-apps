@@ -19,6 +19,7 @@
     takeover: 45,             // seconds before the computer plays for someone who is away (0 = never)
     confirmAllIn: true,       // ask before all-in
     confirmFold: true,        // ask before folding when you could check
+    botRebuy: false,          // computer players buy in again when they are out (off: they leave the table)
     undo: false,              // undo button (off by default)
     odds: true                // the chance graph next to your hand
   };

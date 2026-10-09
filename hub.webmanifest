@@ -9,7 +9,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#120c0e",
-  "theme_color": "#0b3d26",
+  "theme_color": "#120c0e",
   "icons": [
     {
       "src": "icons/spellen-192.png",
