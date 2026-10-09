@@ -123,6 +123,29 @@ test('blinds go up every N hands when the tournament option is on', () => {
   assert.strictEqual(table.level.level, 3, 'blinds zijn niet omhoog gegaan');
 });
 
+test('leaving at once: the stack comes back now, the pot stays, the chips still add up', () => {
+  const cashes = [];
+  const Q = makeQueue();
+  const seats = [
+    { id: 'a', name: 'Anna', kind: 'human', stack: 1000 },
+    { id: 'b', name: 'Bram', kind: 'bot', stack: 1000, style: 'gemiddeld' },
+    { id: 'c', name: 'Carla', kind: 'bot', stack: 1000, style: 'agressief' }
+  ];
+  const table = T.create({ level: { sb: 5, bb: 10, min: 200, max: 1000 }, seats, speed: 'snel', rnd: seededRnd(21), autoNext: false, later: Q.later, cancel: Q.cancel, onCashOut: (i, a) => cashes.push([i, a]) });
+  table.startHand();
+  const before = table.hand.players.reduce((s, p) => s + p.stack + p.total, 0);
+  table.leaveNow(0);
+  assert.strictEqual(cashes.length, 1, 'fiches niet direct teruggegeven');
+  assert.strictEqual(cashes[0][0], 0);
+  assert.ok(cashes[0][1] > 0 && cashes[0][1] < 1000, 'verkeerd bedrag: ' + cashes[0][1]);
+  assert.strictEqual(table.seats[0].kind, 'empty');
+  // the rest of the hand is played without Anna and the chips still add up
+  playUntilDone({ table, Q }, seededRnd(22), 3000);
+  const after = table.hand.players.reduce((s, p) => s + p.stack, 0) + cashes[0][1];   // after the hand: stacks hold the rest
+  assert.ok(table.hand.done, 'ronde is niet klaar');
+  assert.strictEqual(after, before, 'fiches kloppen niet');
+});
+
 let failed = 0;
 for (const [name, fn] of tests) {
   try { fn(); console.log('ok  ' + name); }

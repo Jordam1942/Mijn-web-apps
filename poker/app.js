@@ -126,7 +126,6 @@
       onCashOut: function (i, amount) {
         if (i !== 0) return;
         if (amount > 0) M.give(amount);
-        if (game && game.leaving) { exitSolo(); }
       },
       onLog: function (text) { if (game && game.kind === 'solo') msg(text); },
       onSound: function (k) { sound(k); },
@@ -170,17 +169,12 @@
     show('table');
     saveSolo();
   }
+  // Leave at once: your stack goes back to the bank, the table stops, and you are at the menu.
+  // What you already put into this hand's pot stays there.
   function leaveSolo() {
     if (!game || game.kind !== 'solo') return show('menu');
-    if (game.table.hand && !game.table.hand.done) {
-      game.leaving = true;
-      msg('Je verlaat de tafel na deze ronde.');
-      game.table.leave(0);
-      return;
-    }
-    game.leaving = true;
-    game.table.leave(0);
-    if (!game.table.hand || game.table.hand.done) exitSolo();
+    game.table.leaveNow(0);
+    exitSolo();
   }
   function exitSolo() {
     if (game && game.table) { game.table.stop(); game.table.autoNext = false; }
@@ -402,7 +396,7 @@
   $('t-back').addEventListener('click', function () {
     if (!game) return show('menu');
     if (game.kind === 'solo') {
-      if (game.table.hand && !game.table.hand.done) confirmThen('Je verlaat de tafel na deze ronde. Je fiches gaan dan terug naar je bank.', leaveSolo);
+      if (game.table.hand && !game.table.hand.done) confirmThen('Je verlaat de tafel nu. Wat je al in de pot hebt gelegd, blijft liggen. De rest van je fiches gaat terug naar je bank.', leaveSolo);
       else leaveSolo();
     } else if (game.kind === 'host') {
       confirmThen('Het spel stopt voor iedereen. Doorgaan?', function () { closeTable(); });

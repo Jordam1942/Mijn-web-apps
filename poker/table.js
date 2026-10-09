@@ -172,6 +172,22 @@
       if (T.hand.current === i) timeOut(i);
       else publish();
     }
+    // Leave at once: folded out of the hand, and the stack that is not in the pot goes back now.
+    function leaveNow(i) {
+      var s = T.seats[i], hp = T.hand && T.hand.players[i], amount;
+      if (s.kind === 'empty') return;
+      if (T.hand && !T.hand.done && hp && !hp.folded) {
+        E.forceFold(T.hand, i);
+        sync();
+      }
+      amount = hp ? hp.stack : s.stack;
+      if (hp) hp.stack = 0;
+      if (T.hand) T.hand.startTotal -= amount;   // these chips have left the table: the hand's total goes down
+      s.kind = 'empty'; s.stack = 0; s.leaving = false;
+      if (cfg.onCashOut) cfg.onCashOut(i, amount);
+      if (T.hand && T.hand.done) finishHand();
+      else { publish(); scheduleTurn(); }
+    }
     function cashOut(i) {
       var s = T.seats[i], amount = s.stack;
       if (T.hand && !T.hand.done) return;   // the chips stay in the pot until the hand is over
@@ -251,6 +267,7 @@
     T.startHand = startHand;
     T.act = act;
     T.leave = leave;
+    T.leaveNow = leaveNow;
     T.view = view;
     T.publish = publish;
     T.snapshot = snapshot;

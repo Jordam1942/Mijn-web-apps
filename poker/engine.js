@@ -200,6 +200,18 @@
     return h;
   }
 
+  // Someone leaves the hand at once: they are folded, and the hand goes on without them.
+  // Their chips already in the pot stay there.
+  function forceFold(h, idx) {
+    var p = h.players[idx];
+    if (h.done || !inHand(p)) return { ok: false, error: 'Deze speler zit niet in de ronde.' };
+    p.folded = true;
+    p.needAct = false;
+    if (h.current === idx) afterAction(h, idx);
+    else if (h.players.filter(inHand).length === 1) settle(h);
+    return { ok: true };
+  }
+
   // Who has to act in this street. Nobody has to act when only one player can still bet and nobody is owed a call.
   function markNeedAct(h) {
     var able = h.players.filter(ableOK);
@@ -391,7 +403,7 @@
     CAT: CAT, rankOf: rankOf, suitOf: suitOf, cardLabel: cardLabel,
     randomInt: randomInt, newDeck: newDeck,
     eval5: eval5, evaluate: evaluate, compareKeys: compareKeys, describe: describe,
-    buildPots: buildPots, newHand: newHand, legal: legal, act: act, autoAction: autoAction,
+    buildPots: buildPots, newHand: newHand, legal: legal, act: act, autoAction: autoAction, forceFold: forceFold,
     summary: summary, viewFor: viewFor
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
