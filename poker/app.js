@@ -32,6 +32,7 @@
     if (name === 'settings') renderSettings();
     if (name === 'count') renderCount();
     if (name === 'online') renderOnline();
+    if (name === 'profile') renderProfile();
     show(name);
   }
   function keepAwake(on) {
@@ -142,7 +143,7 @@
     };
   }
   function startSolo(L, buy, bots) {
-    var seats = [{ id: 'jij', name: 'Jij', kind: 'human', stack: buy, persona: myPersona() }], k, persona = 1, opts;
+    var seats = [{ id: 'jij', name: getProfile().name, kind: 'human', stack: buy, persona: myPersona() }], k, persona = 1, opts;
     for (k = 0; k < bots; k++) {
       var stack = Math.round((L.min + (L.max - L.min) * (0.25 + 0.6 * Math.random())) / 10) * 10;
       stack = Math.max(L.min, Math.min(L.max, stack));
@@ -410,17 +411,30 @@
     var base = location.href.split('?')[0].split('#')[0];
     return base + '?join=' + encodeURIComponent(code);
   }
-  // Your own photo: shrunk to 96 x 96 JPEG, kept on this phone, shared only at a table you join or open.
+  // ---- Profile: name, character and photo (kept on this phone, shown at every table) ----
   function loadAvatar() { return store.get('poker-avatar') || null; }
-  // The character you chose in the settings (you are the default)
   function myPersona() { var p = store.get('poker-persona'); return typeof p === 'number' && ART.PRESETS.indexOf(p) >= 0 ? p : ART.YOU; }
-  function showAvatar() {
-    var img = loadAvatar();
-    $('my-avatar-prev').src = img || '';
-    $('my-avatar-prev').hidden = !img;
-    $('my-avatar-del').hidden = !img;
+  function getProfile() {
+    var n = String(store.get('poker-name') || 'Jij').trim().slice(0, 14) || 'Jij';
+    return { name: n, persona: myPersona(), photo: loadAvatar() };
   }
-  $('my-avatar-file').addEventListener('change', function () {
+  function renderProfile() {
+    $('profile-name').value = getProfile().name;
+    refreshProfile();
+  }
+  function refreshProfile() {
+    var p = getProfile();
+    $('profile-prev').innerHTML = p.photo ? '<img class="avatar" src="' + p.photo + '" alt="">' : ART.avatar(p.persona);
+    $('profile-pick').innerHTML = ART.PRESETS.map(function (i) {
+      return '<button class="pick-btn' + (i === p.persona && !p.photo ? ' on' : '') + '" data-persona="' + i + '" aria-label="' + esc(ART.name(i)) + '">' + ART.avatar(i) + '</button>';
+    }).join('');
+    $('profile-del').hidden = !p.photo;
+  }
+  $('profile-pick').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-persona]');
+    if (b) { store.set('poker-persona', +b.dataset.persona); store.del('poker-avatar'); $('profile-file').value = ''; refreshProfile(); }
+  });
+  $('profile-file').addEventListener('change', function () {
     var f = this.files && this.files[0];
     if (!f) return;
     var reader = new FileReader();
@@ -431,17 +445,21 @@
         c.width = 96; c.height = 96;
         c.getContext('2d').drawImage(im, (im.width - side) / 2, (im.height - side) / 2, side, side, 0, 0, 96, 96);
         store.set('poker-avatar', c.toDataURL('image/jpeg', 0.8));
-        showAvatar();
+        refreshProfile();
       };
-      im.onerror = function () { status('online-status', 'Die foto kan ik niet openen. Kies een andere.'); };
+      im.onerror = function () { msg('Die foto kan ik niet openen. Kies een andere.'); };
       im.src = reader.result;
     };
     reader.readAsDataURL(f);
   });
-  $('my-avatar-del').addEventListener('click', function () { store.del('poker-avatar'); $('my-avatar-file').value = ''; showAvatar(); });
+  $('profile-del').addEventListener('click', function () { store.del('poker-avatar'); $('profile-file').value = ''; refreshProfile(); });
+  $('profile-save').addEventListener('click', function () {
+    var n = ($('profile-name').value || '').trim().slice(0, 14) || 'Jij';
+    store.set('poker-name', n);
+    show('menu');
+  });
 
   function renderOnline() {
-    showAvatar();
     var sel = $('host-level');
     if (!sel.options.length) {
       M.LEVELS.forEach(function (l) { var o = document.createElement('option'); o.value = l.level; o.textContent = 'Niveau ' + l.level + ' (' + M.fmt(l.sb) + '/' + M.fmt(l.bb) + ')'; sel.appendChild(o); });
@@ -467,7 +485,7 @@
     if (mine) rejoinGuest(mine);
   });
   $('btn-host').addEventListener('click', function () {
-    var name = ($('host-name').value || 'Host').trim().slice(0, 14) || 'Host';
+    var name = getProfile().name;
     var L = M.LEVELS[+$('host-level').value - 1], buy = Math.floor(+$('host-buy').value);
     if (!(buy >= L.min && buy <= L.max)) return status('online-status', 'De instap moet tussen ' + M.fmt(L.min) + ' en ' + M.fmt(L.max) + ' liggen.');
     if (!M.take(buy)) return status('online-status', 'Je bank is te laag voor deze instap.');
@@ -521,7 +539,7 @@
 
   // ---- Friends online: guest ---------------------------------------------------
   $('btn-join').addEventListener('click', function () {
-    var name = ($('join-name').value || 'Jij').trim().slice(0, 14) || 'Jij';
+    var name = getProfile().name;
     var code = ($('join-code').value || '').trim().toUpperCase();
     var buy = Math.floor(+$('join-buy').value);
     if (!code) return status('online-status', 'Vul de tafelcode in.');
@@ -673,7 +691,7 @@
     status('room-status', text);
   }
   $('room-open').addEventListener('click', function () {
-    var name = ($('room-name').value || 'Host').trim().slice(0, 14) || 'Host';
+    var name = getProfile().name;
     var buy = Math.floor(+$('room-buy').value);
     var L = M.LEVELS.filter(function (l) { return buy >= l.min && buy <= l.max; })[0];
     if (!L) return status('room-status', 'Kies een instap die bij een niveau past.');
@@ -693,7 +711,7 @@
     refreshTable();
   });
   $('room-sit').addEventListener('click', function () {
-    var name = ($('room-name').value || 'Jij').trim().slice(0, 14) || 'Jij';
+    var name = getProfile().name;
     var buy = Math.floor(+$('room-buy').value);
     if (!M.LEVELS.some(function (l) { return buy >= l.min && buy <= l.max; })) return status('room-status', 'Kies een instap die bij een niveau past.');
     if (!M.take(buy)) return status('room-status', 'Je bank is te laag.');
@@ -783,9 +801,7 @@
   ];
   function renderSettings() {
     var p = P.get(), box = $('settings-box');
-    var pick = '<div class="card-panel"><h3>Mijn personage</h3><p class="fine">Zo zien de anderen je aan tafel. Een eigen foto gaat voor.</p><div class="pick">' +
-      ART.PRESETS.map(function (i) { return '<button class="pick-btn' + (i === myPersona() ? ' on' : '') + '" data-persona="' + i + '" aria-label="' + esc(ART.name(i)) + '">' + ART.avatar(i) + '</button>'; }).join('') + '</div></div>';
-    var html = pick;
+    var html = '';
     html += '<div class="card-panel"><h3>Tempo en tijd</h3>' +
       '<label class="field">Tempo computerspelers <select id="set-speed"><option value="rustig">Rustig</option><option value="normaal">Normaal</option><option value="snel">Snel</option></select></label>' +
       '<label class="field">Beurttimer voor jou (alleen bij vrienden) <select id="set-timer"><option value="0">Geen</option><option value="15">15 seconden</option><option value="30">30 seconden</option><option value="60">60 seconden</option></select></label>' +
@@ -805,8 +821,6 @@
     if (t.dataset && t.dataset.set) P.set(t.dataset.set, t.checked);
   });
   $('settings-box').addEventListener('click', function (e) {
-    var pb = e.target.closest('[data-persona]');
-    if (pb) { store.set('poker-persona', +pb.dataset.persona); renderSettings(); return; }
     if (e.target.id === 'set-default') confirmThen('Alle instellingen terugzetten naar de standaard?', function () { P.setMany(P.defaults()); P.apply(); renderSettings(); });
     if (e.target.id === 'set-bank') confirmThen('Je bank op 2.000 fiches zetten?', function () { M.reset(); renderSettings(); });
   });

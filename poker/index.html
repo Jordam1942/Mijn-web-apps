@@ -44,6 +44,7 @@
       <button class="btn gold big" data-go="setup">Spelen tegen de computer</button>
       <button class="btn" id="btn-resume" hidden>Verder spelen</button>
       <button class="btn" data-go="multi">Multiplayer</button>
+      <button class="btn" data-go="profile">Mijn profiel</button>
       <button class="btn" data-go="count">Fichetelling</button>
     </div>
     <div class="row">
@@ -115,6 +116,33 @@
   </div>
 </section>
 
+<!-- Profile: name, character and photo, used at every table -->
+<section id="s-profile" class="screen">
+  <header class="bar"><button class="icon" data-go="menu" aria-label="Terug">‹</button><h2>Mijn profiel</h2><span></span></header>
+  <div class="scroll-box">
+    <div class="card-panel">
+      <div class="profile-head">
+        <div id="profile-prev" class="profile-prev"></div>
+        <label class="field">Naam <input id="profile-name" maxlength="14" value="Jij"></label>
+      </div>
+    </div>
+    <div class="card-panel">
+      <h3>Mijn personage</h3>
+      <p class="fine">Zo zien de anderen je aan tafel, tenzij je een eigen foto kiest.</p>
+      <div id="profile-pick" class="pick"></div>
+    </div>
+    <div class="card-panel">
+      <h3>Mijn foto</h3>
+      <p class="fine">Iedereen aan tafel ziet deze foto. Kies alleen een foto van jezelf, of geen.</p>
+      <div class="row between">
+        <input type="file" id="profile-file" accept="image/*">
+        <button class="btn small danger" id="profile-del" hidden>Verwijder</button>
+      </div>
+    </div>
+    <button class="btn gold big" id="profile-save">Opslaan</button>
+  </div>
+</section>
+
 <!-- Friends: choose online or in the same room -->
 <section id="s-multi" class="screen">
   <header class="bar"><button class="icon" data-go="menu" aria-label="Terug">‹</button><h2>Multiplayer</h2><span></span></header>
@@ -136,17 +164,7 @@
       <button class="btn gold big" id="btn-resume-guest" hidden>Terug naar tafel</button>
     </div>
     <div class="card-panel">
-      <h3>Mijn foto</h3>
-      <p class="fine">Iedereen aan tafel ziet deze foto als je personage. Kies alleen een foto van jezelf, of geen.</p>
-      <div class="row between">
-        <img id="my-avatar-prev" class="avatar-prev" alt="" hidden>
-        <input type="file" id="my-avatar-file" accept="image/*">
-        <button class="btn small danger" id="my-avatar-del" hidden>Verwijder</button>
-      </div>
-    </div>
-    <div class="card-panel">
       <h3>Open een tafel</h3>
-      <label class="field">Je naam <input id="host-name" maxlength="14" value="Jij"></label>
       <label class="field">Instap <input id="host-buy" type="number" step="100" value="1000"></label>
       <label class="field">Niveau <select id="host-level"></select></label>
       <label class="check"><input type="checkbox" id="host-blinds" checked> Blinds lopen op (elke 10 ronden)</label>
@@ -154,7 +172,6 @@
     </div>
     <div class="card-panel">
       <h3>Doe mee met een tafel</h3>
-      <label class="field">Je naam <input id="join-name" maxlength="14" value="Jij"></label>
       <label class="field">Tafelcode <input id="join-code" maxlength="8" autocapitalize="characters" placeholder="bijv. KQ7BX"></label>
       <label class="field">Instap <input id="join-buy" type="number" step="100" value="1000"></label>
       <button class="btn gold big" id="btn-join">Doe mee</button>
@@ -183,7 +200,6 @@
     </div>
     <div class="card-panel" id="room-table-box" hidden>
       <h3>Tafel</h3>
-      <label class="field">Je naam <input id="room-name" maxlength="14" value="Jij"></label>
       <label class="field">Instap <input id="room-buy" type="number" step="100" value="1000"></label>
       <div class="row between">
         <button class="btn gold" id="room-open">Open de tafel</button>
