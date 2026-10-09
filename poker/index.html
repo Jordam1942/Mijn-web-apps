@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b3d26">
+<meta name="description" content="Royal Flush Society: Texas Hold'em met speelgeld. 18+. Geen echt geld.">
+<title>Royal Flush Society</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Age check, shown once -->
+<div id="s-age" class="overlay" hidden>
+  <div class="sheet age">
+    <div class="crest" aria-hidden="true">♠</div>
+    <h2>Royal Flush Society</h2>
+    <p>Dit spel is voor volwassenen. Je speelt met speelgeld: fiches hebben geen waarde en je kunt ze nergens voor omzetten of kopen.</p>
+    <label class="check"><input type="checkbox" id="age-ok"> Ik ben 18 jaar of ouder</label>
+    <button class="btn gold big" id="age-go" disabled>Doorgaan</button>
+  </div>
+</div>
+
+<!-- Main menu -->
+<section id="s-menu" class="screen">
+  <div class="menu">
+    <div class="brand">
+      <div class="crest" aria-hidden="true">♠</div>
+      <h1>Royal Flush<br>Society</h1>
+      <p class="tag">Speelgeld · 18+</p>
+    </div>
+    <div class="bank-card" aria-live="polite">
+      <span>Je bank</span>
+      <strong id="bank">2.000</strong>
+      <small>+20 fiches per minuut · tot 1 uur als je weg bent</small>
+    </div>
+    <div class="menu-buttons">
+      <button class="btn gold big" data-go="setup">Spelen tegen de computer</button>
+      <button class="btn" id="btn-resume" hidden>Verder spelen</button>
+      <button class="btn" data-go="online">Met vrienden op afstand</button>
+      <button class="btn" data-go="room">Met vrienden in dezelfde kamer</button>
+      <button class="btn" data-go="count">Fichetelling</button>
+    </div>
+    <div class="row">
+      <button class="btn ghost" data-go="settings">Instellingen</button>
+      <a class="btn ghost" href="handleiding.html">Handleiding</a>
+      <button class="btn ghost" id="btn-share">Deel</button>
+    </div>
+  </div>
+</section>
+
+<!-- Setup: level and buy-in -->
+<section id="s-setup" class="screen">
+  <header class="bar"><button class="icon" data-go="menu" aria-label="Terug">‹</button><h2>Tafel kiezen</h2><span></span></header>
+  <div class="scroll-box">
+    <p class="hint">Kies een niveau. Je hebt minstens de minimale instap nodig.</p>
+    <div id="level-list" class="levels"></div>
+    <div class="buyin" id="buyin-box">
+      <div class="row between"><span>Instap</span><strong id="buy-out">0</strong></div>
+      <input type="range" id="buy-in" step="100" aria-label="Instap">
+      <div class="row between"><button class="btn small" id="buy-min">Laag</button><button class="btn small" id="buy-max">Hoog</button></div>
+    </div>
+    <div class="buyin">
+      <div class="row between"><span>Computerspelers</span><strong id="bots-out">3</strong></div>
+      <input type="range" id="bots" min="1" max="7" value="3" aria-label="Aantal computerspelers">
+    </div>
+    <label class="check buyin"><input type="checkbox" id="blinds-up"> Blinds lopen op (elke 10 ronden, toernooi)</label>
+    <button class="btn gold big" id="btn-deal">Aanschuiven</button>
+  </div>
+</section>
+
+<!-- Table (solo, host or friend) -->
+<section id="s-table" class="screen table-screen">
+  <header class="topbar">
+    <button class="icon" id="t-back" aria-label="Stoppen en terug">‹</button>
+    <div class="lvl" id="t-level"></div>
+    <div class="pot" id="t-pot" aria-live="polite"></div>
+    <button class="icon" id="t-chat" aria-label="Chat" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H9l-5 4z"/></svg></button>
+  </header>
+  <div class="felt" id="felt">
+    <div class="board" id="board"></div>
+    <div class="seats" id="seats"></div>
+    <div class="timer" id="timer" hidden><span id="timer-bar"></span></div>
+  </div>
+  <div class="odds" id="odds" aria-live="polite">
+    <div class="odds-top"><span>Kans om te winnen</span><strong id="odds-pct">–</strong></div>
+    <div class="odds-bar" aria-hidden="true"><span id="odds-win"></span><span id="odds-tie"></span><span id="odds-lose"></span></div>
+    <div class="odds-hand" id="odds-hand"></div>
+  </div>
+  <div class="msg" id="t-msg" aria-live="polite"></div>
+  <div class="actions">
+    <div class="raise-row" id="raise-row" hidden>
+      <div class="row between"><span>Verhogen naar</span><strong id="raise-out">0</strong></div>
+      <input type="range" id="raise-range" aria-label="Verhogen naar">
+      <div class="quick">
+        <button class="btn small" data-quick="min">Min</button>
+        <button class="btn small" data-quick="half">½ pot</button>
+        <button class="btn small" data-quick="pot">Pot</button>
+        <button class="btn small danger" data-quick="allin">All-in</button>
+      </div>
+      <div class="row between"><button class="btn small ghost" id="raise-cancel">Annuleren</button><button class="btn small gold" id="raise-ok">Verhogen</button></div>
+    </div>
+    <button class="btn small ghost undo" id="b-undo" hidden>Ongedaan maken</button>
+    <div class="act-row" id="act-row">
+      <button class="act fold" id="b-fold">Passen</button>
+      <button class="act call" id="b-call">Checken</button>
+      <button class="act raise" id="b-raise">Verhogen</button>
+    </div>
+  </div>
+</section>
+
+<!-- Friends online -->
+<section id="s-online" class="screen">
+  <header class="bar"><button class="icon" data-go="menu" aria-label="Terug">‹</button><h2>Vrienden op afstand</h2><span></span></header>
+  <div class="scroll-box">
+    <p class="hint">Iedereen speelt op de eigen telefoon. Het spel heeft internet nodig om elkaar te vinden.</p>
+    <div class="card-panel">
+      <h3>Open een tafel</h3>
+      <label class="field">Je naam <input id="host-name" maxlength="14" value="Jij"></label>
+      <label class="field">Instap <input id="host-buy" type="number" step="100" value="1000"></label>
+      <label class="field">Niveau <select id="host-level"></select></label>
+      <button class="btn gold big" id="btn-host">Open de tafel</button>
+    </div>
+    <div class="card-panel">
+      <h3>Doe mee met een tafel</h3>
+      <label class="field">Je naam <input id="join-name" maxlength="14" value="Jij"></label>
+      <label class="field">Tafelcode <input id="join-code" maxlength="8" autocapitalize="characters" placeholder="bijv. KQ7BX"></label>
+      <label class="field">Instap <input id="join-buy" type="number" step="100" value="1000"></label>
+      <button class="btn gold big" id="btn-join">Doe mee</button>
+    </div>
+    <p class="status" id="online-status" role="status"></p>
+  </div>
+</section>
+
+<!-- Friends in the same room (QR, no internet) -->
+<section id="s-room" class="screen">
+  <header class="bar"><button class="icon" data-go="menu" aria-label="Terug">‹</button><h2>In dezelfde kamer</h2><span></span></header>
+  <div class="scroll-box">
+    <p class="hint">Zonder internet: scan elkaars QR-code. Elke telefoon een keer, daarna kun je aan tafel.</p>
+    <div class="card-panel">
+      <h3>Ik open de tafel</h3>
+      <p class="fine">Laat je vriend deze QR scannen. Scan daarna zijn antwoord-QR.</p>
+      <div id="room-host-qr" class="qr-box"></div>
+      <div class="row between"><button class="btn small" id="room-host-scan">Scan antwoord</button><button class="btn small" id="room-host-next">Volgende vriend</button></div>
+    </div>
+    <div class="card-panel">
+      <h3>Ik doe mee</h3>
+      <div class="row between"><button class="btn small" id="room-join-scan">Scan QR van je vriend</button></div>
+      <div id="room-join-qr" class="qr-box"></div>
+      <label class="field">Of plak de code <input id="room-paste" placeholder="Plak hier"></label>
+      <button class="btn small" id="room-paste-go">Gebruik deze code</button>
+    </div>
+    <div class="card-panel" id="room-table-box" hidden>
+      <h3>Tafel</h3>
+      <label class="field">Je naam <input id="room-name" maxlength="14" value="Jij"></label>
+      <label class="field">Instap <input id="room-buy" type="number" step="100" value="1000"></label>
+      <div class="row between">
+        <button class="btn gold" id="room-open">Open de tafel</button>
+        <button class="btn gold" id="room-sit">Ga zitten</button>
+      </div>
+      <p class="fine">Tafelcode: <strong id="room-code">–</strong></p>
+    </div>
+    <p class="status" id="room-status" role="status"></p>
+  </div>
+  <div class="scanner" id="scanner" hidden>
+    <video id="scan-video" playsinline muted></video>
+    <canvas id="scan-canvas" hidden></canvas>
+    <button class="btn" id="scan-stop">Stoppen</button>
+  </div>
+</section>
+
+<!-- Fichetelling: count the chips for an evening with real cards -->
+<section id="s-count" class="screen">
+  <header class="bar"><button class="icon" data-go="menu" aria-label="Terug">‹</button><h2>Fichetelling</h2><button class="icon" id="count-reset" aria-label="Opnieuw beginnen">↺</button></header>
+  <div class="scroll-box">
+    <p class="hint">Voor een avond met echte kaarten. De app houdt de fiches en de pot bij.</p>
+    <div class="card-panel">
+      <div class="row between"><span>Pot</span><strong id="count-pot">0</strong></div>
+      <div class="row between"><span>Blinds</span>
+        <select id="count-blinds"></select>
+      </div>
+    </div>
+    <div id="count-players"></div>
+    <button class="btn ghost" id="count-add">Speler toevoegen</button>
+  </div>
+</section>
+
+<!-- Settings -->
+<section id="s-settings" class="screen">
+  <header class="bar"><button class="icon" data-go="menu" aria-label="Terug">‹</button><h2>Instellingen</h2><span></span></header>
+  <div class="scroll-box" id="settings-box"></div>
+</section>
+
+<!-- Sheets: confirmations and chat -->
+<div id="sheet" class="overlay" hidden>
+  <div class="sheet" id="sheet-body"></div>
+</div>
+
+<script src="vendor/qrcode.js"></script>
+<script src="vendor/peerjs.min.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="art.js"></script>
+<script src="money.js"></script>
+<script src="table.js"></script>
+<script src="online.js"></script>
+<script src="prefs.js"></script>
+<script src="sfx.js"></script>
+<script src="net.js"></script>
+<script src="ring.js"></script>
+<script src="peer.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

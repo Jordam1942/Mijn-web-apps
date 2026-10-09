@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b3d26">
+<title>Handleiding · Royal Flush Society</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* This page scrolls: it is the rules, read at your own pace. */
+  body { overflow: auto; }
+  .guide { max-width: 560px; margin: 0 auto; padding: 14px 16px 60px; display: flex; flex-direction: column; gap: 18px; }
+  .guide h1 { font-size: 26px; color: var(--gold-hi); text-align: center; }
+  .guide h2 { font-size: 21px; color: var(--gold-hi); margin-top: 8px; }
+  .guide p, .guide li { font-size: 15.5px; line-height: 1.5; margin: 0; }
+  .guide ol, .guide ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+  .step { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .step .num { font-family: var(--serif); color: var(--gold-hi); font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .rank-row { display: grid; grid-template-columns: 96px 1fr; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .rank-row:last-child { border-bottom: 0; }
+  .rank-row .cards { display: flex; gap: 4px; }
+  .rank-row .cards .card-face { width: 34px; height: 48px; }
+  .rank-row b { font-family: var(--serif); font-size: 16px; }
+  .rank-row small { display: block; color: var(--ink-soft); font-size: 12.5px; }
+  .street { display: flex; align-items: center; gap: 10px; }
+  .street .cards { display: flex; gap: 4px; }
+  .street .cards .card-face, .street .cards .slot { width: 34px; height: 48px; }
+  .street .slot { display: inline-block; width: 34px; height: 48px; border: 1px dashed var(--line); border-radius: 6px; }
+  .seat-plan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .seat-plan div { text-align: center; padding: 10px 6px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); font-size: 13.5px; }
+  .seat-plan b { display: block; font-family: var(--serif); font-size: 18px; color: var(--gold-hi); }
+  .odds-demo { display: flex; flex-direction: column; gap: 6px; }
+  .odds-demo .odds-bar { height: 14px; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--ink-soft); }
+  .legend span::before { content: ''; display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  .legend .w::before { background: #d2a94f; }
+  .legend .t::before { background: #7d8ea3; }
+  .legend .l::before { background: #7a1424; }
+  .back { text-align: center; }
+</style>
+</head>
+<body>
+<main class="guide">
+  <a class="back btn ghost" href="index.html">‹ Terug naar het menu</a>
+  <h1>Handleiding</h1>
+  <p>Dit is Texas Hold'em. Je speelt met <strong>speelgeld</strong>: fiches hebben geen waarde en je kunt ze nergens voor omzetten of kopen. Het spel is voor volwassenen (18+).</p>
+
+  <section class="step">
+    <div class="num">1 · Het doel</div>
+    <p>Win fiches van de andere spelers. Wie geen fiches meer heeft, is uitgespeeld. Wie de meeste fiches heeft aan het eind, is de winnaar van de tafel.</p>
+  </section>
+
+  <section class="step">
+    <div class="num">2 · Je hebt twee kaarten</div>
+    <p>Je krijgt twee kaarten die alleen jij ziet. Daarna komen er vijf gedeelde kaarten op tafel. Je maakt je beste hand van vijf kaarten uit je twee en de tafelkaarten.</p>
+  </section>
+
+  <section class="step">
+    <div class="num">3 · De handen, van laag naar hoog</div>
+    <p>Hoger in de lijst wint. Bij gelijke handen telt de hoogste kaart, daarna de volgende.</p>
+    <div id="ranks"></div>
+  </section>
+
+  <section class="step">
+    <div class="num">4 · De ronde stap voor stap</div>
+    <ol>
+      <li><b>Blinds:</b> twee spelers leggen verplicht een kleine en een grote inzet (de blinds) neer.</li>
+      <li><b>Kaarten:</b> iedereen krijgt twee kaarten.</li>
+      <li><b>Inzetronde:</b> om de beurt kies je een actie (zie hieronder).</li>
+      <li><b>Flop:</b> drie kaarten op tafel. Weer een inzetronde.</li>
+      <li><b>Turn:</b> de vierde kaart. Weer een inzetronde.</li>
+      <li><b>River:</b> de vijfde en laatste kaart. Laatste inzetronde.</li>
+      <li><b>Showdown:</b> wie nog over is, legt de kaarten open. De beste hand wint de pot.</li>
+    </ol>
+    <div id="streets"></div>
+  </section>
+
+  <section class="step">
+    <div class="num">5 · De knop en de blinds</div>
+    <p>De <b>knop</b> (D) schuift elke ronde één plek door. De speler links van de knop legt de kleine blind, de volgende de grote blind. Na de flop begint de actie links van de knop.</p>
+    <div class="seat-plan">
+      <div><b>D</b>De knop</div>
+      <div><b>SB</b>Kleine blind</div>
+      <div><b>BB</b>Grote blind</div>
+    </div>
+    <p>Bij twee spelers is de knop tegelijk de kleine blind.</p>
+  </section>
+
+  <section class="step">
+    <div class="num">6 · Je acties</div>
+    <ul>
+      <li><b>Passen:</b> je geeft je kaarten op en legt niets meer in. Je inzet blijft liggen.</li>
+      <li><b>Checken:</b> niets inleggen. Mag alleen als er niemand heeft ingezet.</li>
+      <li><b>Meegaan:</b> gelijk maken met de inzet van de anderen.</li>
+      <li><b>Verhogen:</b> meer inzetten dan de anderen. De verhoging is minstens zo groot als de vorige.</li>
+      <li><b>All-in:</b> al je fiches inzetten. Je mag dan niet meer verliezen dan wat je hebt ingezet, de rest gaat naar een zijpot.</li>
+    </ul>
+  </section>
+
+  <section class="step">
+    <div class="num">7 · Zijpotten</div>
+    <p>Als iemand all-in gaat met minder fiches dan de anderen, speelt de rest om een <b>zijpot</b>. Alleen wie in die zijpot heeft ingelegd, kan hem winnen. Gaat niemand mee boven een bedrag, dan krijg je dat bedrag terug.</p>
+  </section>
+
+  <section class="step">
+    <div class="num">8 · De kanskaart</div>
+    <p>Naast je hand zie je hoe groot de kans is dat je de ronde wint, als de kaarten nog onbekend waren. Het getal verandert elke straat.</p>
+    <div class="odds-demo">
+      <div class="odds-top"><span>Kans om te winnen</span><strong>62%</strong></div>
+      <div class="odds-bar"><span style="width:55%;background:linear-gradient(90deg,#d2a94f,#f0cf7a)"></span><span style="width:14%;background:#7d8ea3"></span><span style="width:31%;background:#7a1424"></span></div>
+      <div class="legend"><span class="w">Winnen</span><span class="t">Gelijk</span><span class="l">Verliezen</span></div>
+    </div>
+    <p class="fine">De kans is een schatting: de app deelt de onbekende kaarten duizenden keren op een willekeurige manier en telt wie wint. Het is een hulp, geen garantie.</p>
+  </section>
+
+  <section class="step">
+    <div class="num">9 · Je bank en de tafels</div>
+    <ul>
+      <li>Je bank begint met 2.000 fiches. Elke minuut komt er 20 bij, ook als de app dicht is, maximaal voor 1 uur.</li>
+      <li>Om aan een tafel te zitten, zet je een <b>instap</b> in. Die ligt tussen de minimale en maximale instap van het niveau.</li>
+      <li>Als je weggaat, gaan je fiches terug naar je bank. In een ronde gebeurt dat na de ronde.</li>
+      <li>Er zijn 20 niveaus. Hogere niveaus hebben hogere blinds en een hogere instap.</li>
+    </ul>
+  </section>
+
+  <section class="step">
+    <div class="num">10 · Met vrienden</div>
+    <ul>
+      <li><b>Op afstand:</b> een van jullie opent de tafel en laat de QR-code of link zien. Iedereen speelt op de eigen telefoon.</li>
+      <li><b>In dezelfde kamer:</b> zonder internet. Elke telefoon scant de QR-code van de ander, daarna kun je aan tafel.</li>
+      <li><b>Chat:</b> alleen aan de tafel zelf. Berichten verdwijnen als de tafel sluit.</li>
+      <li><b>Wegvallen:</b> als iemand weg is, neemt de computer de beurt over na de tijd die je in de instellingen kiest.</li>
+    </ul>
+  </section>
+
+  <section class="step">
+    <div class="num">11 · Fichetelling</div>
+    <p>Speel je met echte kaarten? Dan houdt de fichetelling de fiches, de pot en de blinds bij. Geen spelregels, alleen de tellingen.</p>
+  </section>
+
+  <section class="step">
+    <div class="num">12 · Instellingen</div>
+    <p>Je zet geluid, trillen, animaties (per onderdeel), tempo, de beurttimer en de vraag bij all-in of passen zelf aan. Bij "minder beweging" op je telefoon staan de animaties uit.</p>
+  </section>
+
+  <a class="back btn ghost" href="index.html">‹ Terug naar het menu</a>
+</main>
+
+<script src="engine.js"></script>
+<script src="art.js"></script>
+<script>
+  // The pictures below are real cards, drawn by the app itself.
+  (function () {
+    var E = window.PokerEngine, ART = window.PokerArt;
+    function c(r, s) { return ['s', 'h', 'r', 'k'].indexOf(s) * 13 + (r - 2); }
+    var ranks = [
+      ['Hoge kaart', 'Geen paar: de hoogste kaart telt.', [c(14, 's'), c(10, 'h'), c(7, 'r'), c(5, 'k'), c(3, 's')]],
+      ['Paar', 'Twee kaarten van dezelfde waarde.', [c(9, 's'), c(9, 'h'), c(13, 'r'), c(7, 'k'), c(4, 's')]],
+      ['Twee paar', 'Twee verschillende paren.', [c(12, 's'), c(12, 'h'), c(6, 'r'), c(6, 'k'), c(14, 's')]],
+      ['Drie gelijke', 'Drie kaarten van dezelfde waarde.', [c(8, 's'), c(8, 'h'), c(8, 'r'), c(13, 'k'), c(2, 's')]],
+      ['Straat', 'Vijf kaarten achter elkaar, niet van dezelfde kleur.', [c(5, 's'), c(6, 'h'), c(7, 'r'), c(8, 'k'), c(9, 's')]],
+      ['Kleur', 'Vijf kaarten van dezelfde kleur.', [c(2, 'h'), c(6, 'h'), c(9, 'h'), c(11, 'h'), c(13, 'h')]],
+      ['Full house', 'Drie gelijke en een paar.', [c(11, 's'), c(11, 'h'), c(11, 'r'), c(4, 'k'), c(4, 's')]],
+      ['Carré', 'Vier kaarten van dezelfde waarde.', [c(10, 's'), c(10, 'h'), c(10, 'r'), c(10, 'k'), c(3, 's')]],
+      ['Straight flush', 'Een straat in één kleur.', [c(5, 'r'), c(6, 'r'), c(7, 'r'), c(8, 'r'), c(9, 'r')]],
+      ['Royal flush', 'De hoogste straat in één kleur: van tien tot aas.', [c(10, 's'), c(11, 's'), c(12, 's'), c(13, 's'), c(14, 's')]]
+    ];
+    var html = '';
+    ranks.slice().reverse().forEach(function (r, k) {
+      html += '<div class="rank-row"><div class="cards">' + r[2].map(function (x) { return ART.card(x); }).join('') + '</div>' +
+        '<div><b>' + (10 - k) + '. ' + r[0] + '</b><small>' + r[1] + '</small></div></div>';
+    });
+    document.getElementById('ranks').innerHTML = html;
+
+    var board = [c(10, 'h'), c(4, 'r'), c(13, 's'), c(2, 'k'), c(7, 'h')];
+    var stages = [['Voor de flop', 0], ['Flop', 3], ['Turn', 4], ['River', 5]];
+    var sh = '';
+    stages.forEach(function (s) {
+      var cards = '';
+      for (var i = 0; i < 5; i++) cards += i < s[1] ? ART.card(board[i]) : '<span class="slot"></span>';
+      sh += '<div class="street"><b style="width:96px">' + s[0] + '</b><div class="cards">' + cards + '</div></div>';
+    });
+    document.getElementById('streets').innerHTML = '<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">' + sh + '</div>';
+  })();
+</script>
+</body>
+</html>
