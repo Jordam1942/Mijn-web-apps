@@ -376,7 +376,10 @@
       if (q === 'pot') to = cur + pot;
       if (q === 'allin') to = L.maxTo;
       raise.to = Math.max(L.minTo, Math.min(L.maxTo, to));
-      updateRaiseOut();
+      // one tap is enough: the quick buttons raise straight away
+      if (raise.to >= L.maxTo) { closeRaise(); return confirmAction({ type: 'allin' }); }
+      send({ type: 'raise', to: raise.to });
+      closeRaise();
     });
   });
 
