@@ -43,8 +43,7 @@
     <div class="menu-buttons">
       <button class="btn gold big" data-go="setup">Spelen tegen de computer</button>
       <button class="btn" id="btn-resume" hidden>Verder spelen</button>
-      <button class="btn" data-go="online">Met vrienden op afstand</button>
-      <button class="btn" data-go="room">Met vrienden in dezelfde kamer</button>
+      <button class="btn" data-go="multi">Met vrienden</button>
       <button class="btn" data-go="count">Fichetelling</button>
     </div>
     <div class="row">
@@ -116,9 +115,19 @@
   </div>
 </section>
 
+<!-- Friends: choose online or in the same room -->
+<section id="s-multi" class="screen">
+  <header class="bar"><button class="icon" data-go="menu" aria-label="Terug">‹</button><h2>Met vrienden</h2><span></span></header>
+  <div class="scroll-box">
+    <p class="hint">Kies hoe je speelt. Je kunt later altijd wisselen.</p>
+    <button class="btn gold big" data-go="online">Op afstand, via internet</button>
+    <button class="btn big" data-go="room">In dezelfde kamer, zonder internet</button>
+  </div>
+</section>
+
 <!-- Friends online -->
 <section id="s-online" class="screen">
-  <header class="bar"><button class="icon" data-go="menu" aria-label="Terug">‹</button><h2>Vrienden op afstand</h2><span></span></header>
+  <header class="bar"><button class="icon" data-go="menu" aria-label="Terug">‹</button><h2>Vrienden op afstand</h2><button class="btn small ghost" data-go="room">In de kamer</button></header>
   <div class="scroll-box">
     <p class="hint">Iedereen speelt op de eigen telefoon. Het spel heeft internet nodig om elkaar te vinden.</p>
     <div class="card-panel" id="resume-box" hidden>
@@ -156,7 +165,7 @@
 
 <!-- Friends in the same room (QR, no internet) -->
 <section id="s-room" class="screen">
-  <header class="bar"><button class="icon" data-go="menu" aria-label="Terug">‹</button><h2>In dezelfde kamer</h2><span></span></header>
+  <header class="bar"><button class="icon" data-go="menu" aria-label="Terug">‹</button><h2>In dezelfde kamer</h2><button class="btn small ghost" data-go="online">Op afstand</button></header>
   <div class="scroll-box">
     <p class="hint">Zonder internet: scan elkaars QR-code. Elke telefoon een keer, daarna kun je aan tafel.</p>
     <div class="card-panel">
