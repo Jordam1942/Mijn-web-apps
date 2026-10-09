@@ -1,13 +1,13 @@
 /*
  * Your bank (play money), the 20 table levels, and the income per minute.
- * Fiches come in every minute, also while the app is closed, without a limit.
+ * Fiches come in every minute, also while the app is closed, up to one week at a time.
  */
 (function (root) {
   'use strict';
 
   var KEY = 'poker-bank-v1';
   var RATE = 20;             // fiches per minute
-  var MAX_MINUTES = Infinity; // no limit: fiches keep coming in, also while the app is closed
+  var MAX_MINUTES = 7 * 24 * 60; // at most one week of income at a time, also while the app is closed
   var START = 2000;
 
   // Level n: blinds sb/bb, buy-in between min and max.
@@ -34,7 +34,7 @@
     if (elapsed >= 1) {
       minutes = Math.min(Math.floor(elapsed), MAX_MINUTES);
       b.balance += minutes * RATE;
-      b.at = b.at + minutes * 60000;
+      b.at = elapsed > MAX_MINUTES ? now : b.at + minutes * 60000;   // past the limit: start counting again from now
     }
     write(b);
     return b.balance;
