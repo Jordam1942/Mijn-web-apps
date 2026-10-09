@@ -193,6 +193,14 @@
     msg('Je fiches zijn op. Kijk de ronde af en ga daarna naar het hoofdmenu.');
   }
 
+  // Fiches as a stack: more fiches, a taller stack. kind: pot | mini
+  function chipStack(amount, kind) {
+    var n = Math.max(1, Math.min(kind === 'pot' ? 9 : 5, Math.round(Math.log10(amount + 1) * 2.2)));
+    var out = '<span class="chips ' + (kind || '') + '" aria-hidden="true">';
+    for (var i = 0; i < n; i++) out += '<i class="disc d' + (i % 3) + '"></i>';
+    return out + '</span>';
+  }
+
   // ---- Table rendering -------------------------------------------------------
   // view: the table view (table.js), or a guest's combined view.
   var lastBoard = 0, lastDone = true;
@@ -202,7 +210,7 @@
     lastBoard = v.board.length; lastDone = v.done;
     var dealBoard = newStreet && P.fx('fxDeal'), dealHole = newHand && P.fx('fxDeal');
     $('t-level').textContent = v.level.name + ' · ' + M.fmt(v.level.sb) + '/' + M.fmt(v.level.bb);
-    $('t-pot').textContent = 'Pot ' + M.fmt(v.pot);
+    $('t-potbox').innerHTML = v.pot > 0 ? chipStack(v.pot, 'pot') + '<strong>' + M.fmt(v.pot) + '</strong>' : '';
     $('t-chat').hidden = !game || game.kind === 'solo';
     // Board
     var board = '';
@@ -223,8 +231,8 @@
         (s.img ? '<img class="avatar" src="' + s.img + '" alt="">' : ART.avatar(s.persona || 0)) +
         (s.button ? '<span class="dealer" aria-label="Knop">D</span>' : '') +
         '<span class="nm">' + esc(s.name) + '</span>' +
-        '<span class="st">' + M.fmt(s.stack) + '</span>' + tag +
-        (s.bet > 0 ? '<span class="bet">' + M.fmt(s.bet) + '</span>' : '') +
+        '<span class="st">' + chipStack(s.stack, 'mini') + M.fmt(s.stack) + '</span>' + tag +
+        (s.bet > 0 ? '<span class="bet">' + chipStack(s.bet, 'mini') + M.fmt(s.bet) + '</span>' : '') +
         '</div>';
     });
     $('seats').innerHTML = seats;

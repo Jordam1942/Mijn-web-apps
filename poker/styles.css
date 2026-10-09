@@ -299,3 +299,17 @@ table.score td.hostbtns { text-align: left; padding-bottom: 10px; }
 .raise-row .quick .btn { min-height: 52px; font-size: 16px; }
 .raise-row #raise-ok { min-height: 58px; font-size: 17px; }
 .raise-row .raise-cancel { min-height: 40px; padding: 4px; font-size: 14px; }
+
+/* Fiches on the table: the pot in the middle, bets and stacks as small stacks */
+.potbox { position: absolute; left: 50%; top: 67%; transform: translateX(-50%); z-index: 4; display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: none; }
+.potbox strong { font-family: var(--serif); font-size: 15px; color: var(--gold-hi); text-shadow: 0 1px 3px rgba(0,0,0,.7); font-variant-numeric: tabular-nums; }
+.chips { display: inline-flex; flex-direction: column-reverse; align-items: center; vertical-align: middle; }
+.chips .disc { display: block; width: 24px; height: 7px; border-radius: 50%; margin-top: -4px; border: 1px solid rgba(0,0,0,.45); box-shadow: 0 1px 1px rgba(0,0,0,.4); }
+.chips .disc.d0 { background: linear-gradient(#b3202c, #6e1119); }
+.chips .disc.d1 { background: linear-gradient(#f4ecd9, #c9bda6); }
+.chips .disc.d2 { background: linear-gradient(#2e7d4f, #1c5234); }
+.chips.mini .disc { width: 14px; height: 5px; margin-top: -3px; }
+.chips.pot .disc { width: 30px; height: 9px; margin-top: -6px; }
+.seat .st .chips.mini { margin-right: 4px; }
+.seat .bet .chips.mini { margin-right: 4px; }
+.seat .bet { display: inline-flex; align-items: center; }

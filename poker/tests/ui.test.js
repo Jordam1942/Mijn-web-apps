@@ -61,14 +61,14 @@ async function run() {
     await page.click('[data-go="setup"]');
     await page.click('#btn-deal');
     await page.waitForTimeout(1500);
-    const potBefore = await page.textContent('#t-pot');
+    const potBefore = await page.textContent('#t-potbox');
     const snap = JSON.parse(await page.evaluate(() => localStorage.getItem('poker-saved-solo')));
     assert.ok(!('deck' in (snap.hand || {})), 'het stapel kaarten is opgeslagen');
     assert.ok(snap.hand.players.every((p, i) => i === 0 || p.cards.length === 0), 'kaarten van de computer zijn opgeslagen');
     await page.reload({ waitUntil: 'load' });
     await page.click('#btn-resume');
     await page.waitForTimeout(500);
-    assert.strictEqual(await page.textContent('#t-pot'), potBefore, 'de pot is anders na het hervatten');
+    assert.strictEqual(await page.textContent('#t-potbox'), potBefore, 'de pot is anders na het hervatten');
     await ctx.close();
     console.log('ok  opgeslagen tafel komt terug, zonder verborgen kaarten');
 
