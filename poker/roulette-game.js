@@ -250,7 +250,7 @@
   }
   function renderBots() {
     $('bots').innerHTML = bots.map(function (b) {
-      return '<div class="rl-bot"><b>' + b.name + '</b><span>' + fmt(b.stack) + '</span><small>' + (b.last || '') + '</small></div>';
+      return '<span class="rl-bot" title="' + (b.last || '') + '"><b>' + b.name + '</b> ' + fmt(b.stack) + '</span>';
     }).join('');
   }
   function renderHistory() {
@@ -260,7 +260,8 @@
   }
   function render() {
     $('bank').textContent = fmt(M.balance()) + ' fiches';
-    $('sum').textContent = 'Jouw inzet: ' + fmt(total(st.placed));
+    var mine = total(st.placed);
+    $('btn-spin').textContent = mine ? 'Draai · ' + fmt(mine) : 'Draai het rad';
     renderBoard(); renderBots(); renderHistory(); renderChips(); setButtons();
   }
 

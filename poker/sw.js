@@ -1,6 +1,6 @@
 // Offline support: app files are cached on install; Google Fonts are cached the first time they load.
 // Network first so updates arrive; the cache is the fallback when offline.
-var CACHE = 'poker-v1';   // own prefix: the other apps on this site use other prefixes and must not clean up after each other
+var CACHE = 'poker-v2';   // own prefix: the other apps on this site use other prefixes and must not clean up after each other
 var FILES = [
   './', 'index.html', 'handleiding.html', 'styles.css', 'manifest.webmanifest',
   'engine.js', 'ai.js', 'art.js', 'money.js', 'table.js', 'online.js', 'prefs.js', 'sfx.js',
