@@ -195,16 +195,29 @@
 
   // Fiches as piles, like at a real table: several piles, each one a few fiches high.
   // kind: pot | bet | mini
+  // Every fiche value has its own colour, like real chips. The amount is split into the chips it takes,
+  // largest first, and each colour gets its own pile with the value on the top fiche.
+  var CHIPS = [10000, 5000, 1000, 500, 100, 25, 10, 5];
+  var CHIP_CLASS = { 5: 'v5', 10: 'v10', 25: 'v25', 100: 'v100', 500: 'v500', 1000: 'v1000', 5000: 'v5000', 10000: 'v10000' };
+  function chipLabel(v) { return v >= 1000 ? (v / 1000) + 'k' : String(v); }
   function chipStack(amount, kind) {
-    var maxPiles = kind === 'pot' ? 4 : 2, maxHeight = kind === 'pot' ? 7 : (kind === 'bet' ? 5 : 4);
-    var piles = Math.max(1, Math.min(maxPiles, Math.round(Math.log10(amount + 1) * 1.5)));
-    var perPile = Math.max(1, Math.min(maxHeight, Math.round(Math.log10(amount / piles + 1) * 3)));
+    var maxPiles = kind === 'pot' ? 5 : (kind === 'bet' ? 3 : 2), maxHeight = kind === 'pot' ? 6 : (kind === 'bet' ? 4 : 3);
+    var left = Math.max(0, Math.round(amount)), piles = [];
+    CHIPS.forEach(function (v) {
+      var n = Math.floor(left / v);
+      if (n > 0) { piles.push({ v: v, n: n }); left -= n * v; }
+    });
+    if (left > 0) { if (piles.length) piles[piles.length - 1].n += Math.ceil(left / piles[piles.length - 1].v); else piles.push({ v: 5, n: 1 }); }
+    if (!piles.length) piles.push({ v: 5, n: 1 });
+    // too many colours for the space: keep the largest, the rest is added to the smallest one kept
+    while (piles.length > maxPiles) { var last = piles.pop(); piles[piles.length - 1].n += last.n * last.v / piles[piles.length - 1].v; }
     var out = '<span class="chipset ' + kind + '" aria-hidden="true">';
-    for (var p = 0; p < piles; p++) {
-      out += '<span class="pile">';
-      for (var k = 0; k < perPile; k++) out += '<i class="disc d' + ((p + k) % 3) + '"></i>';
+    piles.forEach(function (p) {
+      var h = Math.max(1, Math.min(maxHeight, Math.round(p.n)));
+      out += '<span class="pile" title="' + chipLabel(p.v) + ' x ' + p.n + '">';
+      for (var k = 0; k < h; k++) out += '<i class="disc ' + CHIP_CLASS[p.v] + '">' + (k === h - 1 && kind === 'pot' ? '<b>' + chipLabel(p.v) + '</b>' : '') + '</i>';
       out += '</span>';
-    }
+    });
     return out + '</span>';
   }
 

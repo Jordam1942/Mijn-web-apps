@@ -318,9 +318,6 @@ table.score td.hostbtns { text-align: left; padding-bottom: 10px; }
 .chipset { display: inline-flex; align-items: flex-end; gap: 4px; }
 .chipset .pile { display: inline-flex; flex-direction: column-reverse; align-items: center; }
 .chipset .disc { display: block; border-radius: 50%; border: 1px solid rgba(0,0,0,.45); box-shadow: 0 1px 1px rgba(0,0,0,.4); margin-top: -4px; }
-.chipset .disc.d0 { background: linear-gradient(#b3202c, #6e1119); }
-.chipset .disc.d1 { background: linear-gradient(#f4ecd9, #c9bda6); }
-.chipset .disc.d2 { background: linear-gradient(#2e7d4f, #1c5234); }
 .chipset.pot .disc { width: 26px; height: 8px; margin-top: -5px; }
 .chipset.bet .disc { width: 22px; height: 7px; margin-top: -4px; }
 .chipset.mini .disc { width: 13px; height: 5px; margin-top: -3px; }
@@ -330,3 +327,17 @@ table.score td.hostbtns { text-align: left; padding-bottom: 10px; }
 #t-potbox { top: 34%; transition: left .6s ease, top .6s ease, opacity .5s ease; }
 #t-potbox .chipset { margin-bottom: 2px; }
 .seat .bet { display: none; }
+
+/* Fiche colours by value, like a real casino set */
+.chipset .disc.v5 { background: linear-gradient(#c8332f, #7c1a17); }
+.chipset .disc.v10 { background: linear-gradient(#2f6fb3, #173d6b); }
+.chipset .disc.v25 { background: linear-gradient(#2e8b57, #17502f); }
+.chipset .disc.v100 { background: linear-gradient(#3a3a40, #101014); }
+.chipset .disc.v500 { background: linear-gradient(#7d4aa8, #43205c); }
+.chipset .disc.v1000 { background: linear-gradient(#e2b64a, #9a6d17); }
+.chipset .disc.v5000 { background: linear-gradient(#e07a2e, #8a3f10); }
+.chipset .disc.v10000 { background: linear-gradient(#e8e4da, #9d978a); }
+.chipset .disc { position: relative; }
+.chipset .disc b { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 7px; line-height: 1; color: #fff; text-shadow: 0 0 2px #000; white-space: nowrap; font-weight: 700; }
+.chipset .disc.v10000 b, .chipset .disc.v1000 b { color: #2a1a06; text-shadow: none; }
+.chipset.pot .disc { width: 28px; height: 9px; margin-top: -5px; }
