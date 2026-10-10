@@ -368,3 +368,9 @@ table.score td.hostbtns { text-align: left; padding-bottom: 10px; }
   .act { min-height: 66px; font-size: 17px; }
   .side { padding-right: 14px; }
 }
+
+/* Chance bar: lies flat across the middle of the felt, between the board and your cards */
+.felt > .odds { position: absolute; left: 50%; right: auto; top: 57%; bottom: auto; transform: translateX(-50%); width: 46%; max-width: 280px; height: auto; margin: 0; z-index: 6; flex-direction: row; align-items: center; gap: 8px; padding: 4px 10px; border-radius: 999px; background: rgba(10, 8, 9, 0.8); border: 1px solid var(--gold-lo); }
+.felt > .odds strong { font-size: 14px; min-width: 3.2em; text-align: right; }
+.hbar { position: relative; flex: 1; height: 10px; border-radius: 6px; background: rgba(122, 20, 36, 0.7); overflow: hidden; }
+.hbar span { position: absolute; top: 0; bottom: 0; left: 0; width: 0; background: linear-gradient(90deg, #b98b33, #f0cf7a); transition: width 0.4s ease; }

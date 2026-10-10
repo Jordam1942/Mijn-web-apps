@@ -335,7 +335,7 @@
     if (!P.get().odds) { $('odds').hidden = true; return; }
     $('odds').hidden = false;
     if (!me || !me.cards || !me.cards.length || me.cards[0] === null || me.folded) {
-      $('odds-pct').textContent = '–'; $('odds-fill').style.height = '0';
+      $('odds-pct').textContent = '–'; $('odds-fill').style.width = '0';
       return;
     }
     var opp = v.seats.filter(function (s, i) { return i !== you && !s.out && !s.folded && s.kind !== 'empty'; }).length;
@@ -346,7 +346,7 @@
     }
     var share = A.share(oddsCache.value);
     $('odds-pct').textContent = Math.round(share * 100) + '%';
-    $('odds-fill').style.height = (share * 100).toFixed(1) + '%';
+    $('odds-fill').style.width = (share * 100).toFixed(1) + '%';
   }
 
   // Buttons: only when it is your turn
