@@ -195,12 +195,18 @@
     show('menu');
   }
   // Out of fiches: watch the rest of the hand, then go to the menu. No buying in again.
-  function outOfChips() {
+  // The solo table is over for you: no fiches left, or everyone else has left the table (between hands)
+  function soloOver(v) {
+    if (!(game && game.kind === 'solo' && game.table && (v.done || !game.table.hand))) return false;
+    if (v.seats[0].stack === 0) return true;
+    return !v.seats.some(function (s, i) { return i > 0 && s.kind !== 'empty'; });
+  }
+  function outOfChips(broke) {
     if (!game || game.kind !== 'solo') return;
     game.table.autoNext = false;
     $('b-menu').hidden = false;
     $('act-row').hidden = true;
-    msg('Je fiches zijn op. Kijk de ronde af en ga daarna naar het hoofdmenu.');
+    msg(broke ? 'Je fiches zijn op. Kijk de ronde af en ga daarna naar het hoofdmenu.' : 'Je bent de enige aan tafel. Ga naar het hoofdmenu, je fiches gaan dan terug naar je bank.');
   }
 
   // Fiches as piles, like at a real table: several piles, each one a few fiches high.
@@ -328,7 +334,7 @@
     renderActions(v);
     if (v.legal && !lastTurn) { sound('turn'); buzz(40); }
     lastTurn = !!v.legal;
-    if (game && game.kind === 'solo' && game.table && v.seats[0].stack === 0 && (v.done || !game.table.hand)) outOfChips();
+    if (soloOver(v)) outOfChips(v.seats[0].stack === 0);
   }
 
   function renderOdds(v) {
@@ -377,7 +383,7 @@
     $('b-raise').disabled = !L || !L.canRaise;
     $('b-call').innerHTML = L && !L.canCheck ? 'Meegaan<small>' + M.fmt(L.toCall) + '</small>' : 'Checken';
     if (!L) closeRaise();
-    if (!(game && game.kind === 'solo' && game.table && v.seats[0].stack === 0 && (v.done || !game.table.hand))) $('b-menu').hidden = true;
+    if (!soloOver(v)) $('b-menu').hidden = true;
     if (L && game) timerStart(v.deadline);
     else timerStop();
   }
