@@ -35,6 +35,7 @@
       autoNext: cfg.autoNext !== false
     };
     var timer = null, pauseTimer = null;
+    function levelNow() { return cfg.getDifficulty ? cfg.getDifficulty() : cfg.difficulty; }
 
     // Sound events for the table (the screen or the network plays them).
     function sfx(kind) { if (cfg.onSound) cfg.onSound(kind); }
@@ -125,7 +126,7 @@
     }
     function botMove(i) {
       if (!T.hand || T.hand.done || T.hand.current !== i) return;
-      apply(i, AI.decide(T.hand, i, T.seats[i].style, function () { return rnd(1000000) / 1000000; }, cfg.difficulty));
+      apply(i, AI.decide(T.hand, i, T.seats[i].style, function () { return rnd(1000000) / 1000000; }, levelNow()));
     }
     // Time is up: a person gets check or fold; someone away is taken over by the computer.
     function timeOut(i) {
@@ -137,7 +138,7 @@
         apply(i, { type: L.canCheck ? 'check' : 'fold' });
       } else {
         note('De computer speelt voor ' + s.name + '.');
-        apply(i, AI.decide(T.hand, i, s.style, function () { return rnd(1000000) / 1000000; }, cfg.difficulty));
+        apply(i, AI.decide(T.hand, i, s.style, function () { return rnd(1000000) / 1000000; }, levelNow()));
       }
     }
 

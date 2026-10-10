@@ -123,7 +123,7 @@
   function soloOptions(L) {
     var p = P.get();
     return {
-      level: L, speed: p.speed, difficulty: p.difficulty, turnTimer: 0, takeover: 0, botRebuy: p.botRebuy,   // offline: no timer, you take all the time you want
+      level: L, speed: p.speed, difficulty: p.difficulty, getDifficulty: function () { return P.get().difficulty; }, turnTimer: 0, takeover: 0, botRebuy: p.botRebuy,   // offline: no timer, you take all the time you want
       onChange: function (i, view) { if (i === 0 && game && game.kind === 'solo') { renderTable(view); saveSolo(); } },
       onCashOut: function (i, amount) {
         if (i !== 0) return;
@@ -174,6 +174,14 @@
   }
   // Leave at once: your stack goes back to the bank, the table stops, and you are at the menu.
   // What you already put into this hand's pot stays there.
+  // Keep the game as it is and go to the menu; "Verder spelen" brings it back
+  function saveAndMenu() {
+    if (!game || game.kind !== 'solo') return show('menu');
+    saveSolo();
+    game.table.stop();
+    game = null;
+    show('menu');
+  }
   function leaveSolo() {
     if (!game || game.kind !== 'solo') return show('menu');
     game.table.leaveNow(0);
@@ -228,8 +236,8 @@
   function betSpot(i, pos, you) {
     if (i === you) return { x: pos[i].x + 14, y: pos[i].y - 3 };   // your own bet: next to your picture
     var dx = pos[i].x - 50, dy = pos[i].y - 50;
-    var f = Math.abs(dy) > Math.abs(dx) ? 0.4 : 0.22;               // above or below: further in, so it clears the name
-    return { x: pos[i].x - dx * f, y: pos[i].y - dy * f };
+    if (Math.abs(dy) > Math.abs(dx)) return { x: pos[i].x - dx * 0.4, y: pos[i].y - dy * 0.4 };   // above or below: halfway in, clear of the name
+    return { x: pos[i].x - dx * 0.25, y: pos[i].y + 14 };                                          // left or right: under the name, clear of the cards and the board
   }
   function renderBets(v, pos, you) {
     var layer = $('t-bets'), seen = {};
@@ -463,11 +471,33 @@
     });
   });
 
+  // Settings you can change during a game: the table takes the new level straight away
+  $('t-gear').addEventListener('click', function () {
+    var p = P.get();
+    sheet('<h2>Instellingen</h2>' +
+      '<label class="toggle"><span>Geluid</span><input type="checkbox" data-q="sound"' + (p.sound ? ' checked' : '') + '></label>' +
+      '<label class="toggle"><span>Animaties</span><input type="checkbox" data-q="gfx"' + (p.gfx ? ' checked' : '') + '></label>' +
+      '<label class="toggle"><span>Kanskaart</span><input type="checkbox" data-q="odds"' + (p.odds ? ' checked' : '') + '></label>' +
+      '<label class="field">Tempo computerspelers <select data-q="speed"><option value="rustig">Rustig</option><option value="normaal">Normaal</option><option value="snel">Snel</option></select></label>' +
+      '<label class="field">Niveau computerspelers <select data-q="difficulty"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="extreme">Extreme</option></select></label>',
+      [{ label: 'Klaar', cls: 'gold' }]);
+    $('sheet-body').querySelector('[data-q="speed"]').value = p.speed;
+    $('sheet-body').querySelector('[data-q="difficulty"]').value = p.difficulty;
+  });
+  $('sheet-body').addEventListener('change', function (e) {
+    var q = e.target.dataset && e.target.dataset.q;
+    if (!q) return;
+    P.set(q, e.target.type === 'checkbox' ? e.target.checked : e.target.value);
+    if (q === 'odds' || q === 'sound' || q === 'gfx') { oddsCache.key = ''; }
+  });
+
   $('t-back').addEventListener('click', function () {
     if (!game) return show('menu');
     if (game.kind === 'solo') {
-      if (game.table.hand && !game.table.hand.done) confirmThen('Je verlaat de tafel nu. Wat je al in de pot hebt gelegd, blijft liggen. De rest van je fiches gaat terug naar je bank.', leaveSolo);
-      else leaveSolo();
+      sheet('<h2>Tafel verlaten?</h2><p>Je spel kun je bewaren en later verder spelen. Of je gaat weg: wat je al in de pot hebt gelegd blijft liggen, de rest van je fiches gaat terug naar je bank.</p>',
+        [{ label: 'Spel opslaan en naar het menu', cls: 'gold', fn: saveAndMenu },
+         { label: 'Verlaten', cls: 'danger', fn: leaveSolo },
+         { label: 'Doorgaan', cls: 'ghost' }]);
     } else if (game.kind === 'host') {
       confirmThen('Het spel stopt voor iedereen. Doorgaan?', function () { closeTable(); });
     } else if (game.kind === 'guest') {
