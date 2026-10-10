@@ -14,6 +14,7 @@
   var ROOM_CODE = 'kamer';
   var game = null;          // {kind:'solo'|'host'|'guest', table?, host?, guest?, db?, code?, pub?, me?, undo?}
   var oddsCache = { key: '', value: null };
+  var oddsHist = { key: '', pts: [] };   // your chance at the start of each street, for the small chart
   var lastTurn = false, wakeLock = null, lastScore = [];
   var store = {
     get: function (k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
@@ -335,7 +336,7 @@
     if (!P.get().odds) { $('odds').hidden = true; return; }
     $('odds').hidden = false;
     if (!me || !me.cards || !me.cards.length || me.cards[0] === null || me.folded) {
-      $('odds-pct').textContent = '–'; $('odds-fill').style.width = '0';
+      $('odds-pct').textContent = '–'; drawOddsChart([]);
       return;
     }
     var opp = v.seats.filter(function (s, i) { return i !== you && !s.out && !s.folded && s.kind !== 'empty'; }).length;
@@ -346,7 +347,24 @@
     }
     var share = A.share(oddsCache.value);
     $('odds-pct').textContent = Math.round(share * 100) + '%';
-    $('odds-fill').style.width = (share * 100).toFixed(1) + '%';
+    // One point per street: preflop, flop, turn, river. A new hand starts a new line.
+    var street = { 0: 0, 3: 1, 4: 2, 5: 3 }[v.board.length];
+    if (street === undefined) street = 0;
+    var hk = me.cards.join(',');
+    if (oddsHist.key !== hk) oddsHist = { key: hk, pts: [] };
+    oddsHist.pts[street] = share;
+    drawOddsChart(oddsHist.pts);
+  }
+  // A small line that climbs from left (preflop) to right (river), filled underneath
+  function drawOddsChart(pts) {
+    var W = 96, H = 34, list = [], i;
+    for (i = 0; i < 4; i++) if (pts[i] !== undefined) list.push([Math.round(i / 3 * W), Math.round(H - 4 - pts[i] * (H - 8))]);
+    var svg = $('odds-chart');
+    if (!list.length) { svg.innerHTML = ''; return; }
+    var line = list.map(function (p) { return p[0] + ',' + p[1]; }).join(' ');
+    var last = list[list.length - 1];
+    var area = 'M' + list[0][0] + ',' + H + ' L' + line.split(' ').join(' L') + ' L' + last[0] + ',' + H + ' Z';
+    svg.innerHTML = '<path d="' + area + '" class="oc-area"/><polyline points="' + line + '" class="oc-line"/><circle cx="' + last[0] + '" cy="' + last[1] + '" r="2.4" class="oc-dot"/>';
   }
 
   // Buttons: only when it is your turn

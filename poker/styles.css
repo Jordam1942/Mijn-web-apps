@@ -369,8 +369,10 @@ table.score td.hostbtns { text-align: left; padding-bottom: 10px; }
   .side { padding-right: 14px; }
 }
 
-/* Chance bar: lies flat across the middle of the felt, between the board and your cards */
-.felt > .odds { position: absolute; left: 50%; right: auto; top: 57%; bottom: auto; transform: translateX(-50%); width: 46%; max-width: 280px; height: auto; margin: 0; z-index: 6; flex-direction: row; align-items: center; gap: 8px; padding: 4px 10px; border-radius: 999px; background: rgba(10, 8, 9, 0.8); border: 1px solid var(--gold-lo); }
-.felt > .odds strong { font-size: 14px; min-width: 3.2em; text-align: right; }
-.hbar { position: relative; flex: 1; height: 10px; border-radius: 6px; background: rgba(122, 20, 36, 0.7); overflow: hidden; }
-.hbar span { position: absolute; top: 0; bottom: 0; left: 0; width: 0; background: linear-gradient(90deg, #b98b33, #f0cf7a); transition: width 0.4s ease; }
+/* Chance line: a small, quiet line in the bottom right corner of the felt, climbing from the start of the hand to the river */
+.felt > .odds { position: absolute; left: auto; right: 6px; top: auto; bottom: 6px; transform: none; width: 104px; max-width: none; height: auto; margin: 0; z-index: 6; flex-direction: column; align-items: flex-end; gap: 0; padding: 0; border: 0; border-radius: 0; background: none; opacity: 0.9; pointer-events: none; }
+.felt > .odds strong { font-size: 12px; line-height: 1; color: var(--gold-hi); min-width: 0; text-align: right; font-variant-numeric: tabular-nums; text-shadow: 0 1px 3px rgba(0,0,0,0.7); }
+.odds-chart { width: 96px; height: 34px; display: block; overflow: visible; }
+.oc-area { fill: rgba(240, 207, 122, 0.18); }
+.oc-line { fill: none; stroke: var(--gold-hi); stroke-width: 1.4; stroke-linejoin: round; stroke-linecap: round; opacity: 0.85; }
+.oc-dot { fill: var(--gold-hi); }
