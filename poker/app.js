@@ -134,7 +134,9 @@
       onTurn: function (i) { if (i === 0) buzz(40); }
     };
   }
-  function startSolo(L, buy, bots) {
+  function startSolo(L, buy, botsAsked) {
+    // On Easy there are at most two computer players at the table: an open, simple setting
+    var bots = P.get().difficulty === 'easy' ? Math.min(botsAsked, 2) : botsAsked;
     var seats = [{ id: 'jij', name: getProfile().name, kind: 'human', stack: buy, persona: myPersona() }], k, persona = 1, opts;
     for (k = 0; k < bots; k++) {
       var stack = Math.round((L.min + (L.max - L.min) * (0.25 + 0.6 * Math.random())) / 10) * 10;
