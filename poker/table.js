@@ -131,7 +131,7 @@
     }
     function expertMove(i) {
       if (!T.hand || T.hand.done || T.hand.current !== i) return;
-      apply(i, AI.decide(T.hand, i, 'gemiddeld', function () { return rnd(1000000) / 1000000; }, 'extreme'));
+      apply(i, AI.expert(T.hand, i, function () { return rnd(1000000) / 1000000; }));
     }
     // Let the expert play for you, or take over again (at any moment)
     T.autoPlay = false;
