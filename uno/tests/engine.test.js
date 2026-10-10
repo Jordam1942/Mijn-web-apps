@@ -236,6 +236,25 @@ test('oefenen: alleen de host ziet alle handen, en alleen als oefenen aan staat'
   assert.deepStrictEqual(host.draw, []);
 });
 
+test('ranglijst: alleen gewonnen potjes tellen, oefenpotjes tellen niet mee', () => {
+  const s = setup(2, [['r3'], ['b9', 'g4']], 'r5');
+  s.target = 13;
+  const klaar = play(s, 0, 'r3');
+  assert.strictEqual(U.telt(klaar), true);
+  const oefen = setup(2, [['r3'], ['b9', 'g4']], 'r5');
+  oefen.target = 13;
+  oefen.oefenen = true;
+  assert.strictEqual(U.telt(play(oefen, 0, 'r3')), false);
+  assert.strictEqual(U.telt(U.newGame({ players: 2, rng: seeded(2) })), false);
+});
+
+test('ranglijst: op aantal gewonnen potjes, zonder punten; gelijke stand deelt de plek', () => {
+  const r = U.ranglijst({ Sam: 2, Lisa: 5, Ahmed: 2, Mo: 0 });
+  assert.deepStrictEqual(r.map(x => x.naam), ['Lisa', 'Ahmed', 'Sam', 'Mo']);
+  assert.deepStrictEqual(r.map(x => x.plek), [1, 2, 2, 4]);
+  assert.deepStrictEqual(Object.keys(r[0]).sort(), ['gewonnen', 'naam', 'plek']);
+});
+
 // Duizenden willekeurige potjes. Na elke zet worden de regels gecontroleerd.
 test('duizenden willekeurige potjes: 108 kaarten, de beurt, de richting en geen ongeldige kaart', () => {
   let moves = 0, finished = 0, rounds = 0, unoCalls = 0, catches = 0;

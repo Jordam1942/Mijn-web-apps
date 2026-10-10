@@ -135,7 +135,8 @@
       n: n, dir: 1, cur: 0, dealer: n - 1, round: 0,
       hands: [], draw: [], discard: [], color: null, needColor: null,
       pending: null, drawn: null, unoWindow: null,
-      scores: [], target: TARGET, over: false, winner: null, lastRound: null
+      scores: [], target: TARGET, over: false, winner: null, lastRound: null,
+      oefenen: !!opts.oefenen
     };
     for (var p = 0; p < n; p++) s.scores.push(0);
     startRound(s, opts.rng || defaultRng(), opts.deal);
@@ -294,7 +295,25 @@
     return v;
   }
 
+  // Telt een afgelopen potje mee voor de ranglijst? Oefenpotjes tellen nooit mee.
+  function telt(s) { return !!s.over && !s.oefenen; }
+
+  // Ranglijst op gewonnen potjes, zonder punten. Gelijke stand krijgt dezelfde plek.
+  // gewonnen: {naam: aantal}. Geeft [{naam, gewonnen, plek}] terug, van boven naar beneden.
+  function ranglijst(gewonnen) {
+    var rijen = Object.keys(gewonnen).map(function (naam) { return { naam: naam, gewonnen: gewonnen[naam] }; });
+    rijen.sort(function (a, b) { return b.gewonnen - a.gewonnen || (a.naam < b.naam ? -1 : a.naam > b.naam ? 1 : 0); });
+    var plek = 0, vorige = null;
+    rijen.forEach(function (r, i) {
+      if (r.gewonnen !== vorige) plek = i + 1;
+      r.plek = plek;
+      vorige = r.gewonnen;
+    });
+    return rijen;
+  }
+
   var api = {
+    telt: telt, ranglijst: ranglijst,
     COLORS: COLORS, WILD: WILD, CARDS: CARDS, TARGET: TARGET, PENALTY: PENALTY,
     newGame: newGame, legalActions: legalActions, apply: apply, viewFor: viewFor,
     points: points, canPlay: canPlay, topId: topId, nextSeat: nextSeat
