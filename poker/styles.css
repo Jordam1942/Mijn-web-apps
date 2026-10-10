@@ -453,3 +453,19 @@ table.score td.hostbtns { text-align: left; padding-bottom: 10px; }
   .msg { grid-column: 1 / -1; }
 }
 .screen.rl-screen { max-width: 980px; }
+
+/* Looks like a real table: green baize, cream lines between the boxes, a wooden rim on the wheel */
+.rl-board-wrap { padding: 6px; border-radius: 14px; background: radial-gradient(ellipse at 50% 40%, var(--felt-hi) 0%, var(--felt-lo) 80%); border: 5px solid #4b2a14; box-shadow: inset 0 0 18px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.4); }
+.rl-board { gap: 0; }
+.rl-board .cell { border: 1px solid rgba(244, 236, 217, 0.85); border-radius: 0; background: #7d1a22; color: #fbf8f1; font-family: var(--sans); }
+.rl-board .cell.black { background: #141414; }
+.rl-board .cell.zero { background: #1f7a4a; font-size: 16px; }
+.rl-board .cell.outside, .rl-board .cell.col { background: transparent; color: #fbf8f1; font-weight: 600; letter-spacing: 0.02em; }
+.rl-board .cell.outside.red { background: #7d1a22; }
+.rl-board .cell.outside.black { background: #141414; }
+.rl-board .cell.has-bet { box-shadow: inset 0 0 0 2px var(--gold-hi); }
+.rl-board .cell .amt { top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 22px; padding: 0; border-radius: 50%; display: none; align-items: center; justify-content: center; background: radial-gradient(circle at 35% 30%, #fff8 0 12%, #d2a94f 60%); color: #2a1a06; border: 2px dashed rgba(42, 26, 6, 0.5); font-size: 8px; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5); }
+.rl-board .cell.has-bet .amt { display: flex; }
+.rl-board .cell .bot { color: #fbf8f1; opacity: 0.75; }
+.rl-wheel { width: 96px; height: 96px; }
+.rl-wheel .pointer { border-top-color: #f0cf7a; }

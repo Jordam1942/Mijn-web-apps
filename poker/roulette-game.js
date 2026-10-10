@@ -40,16 +40,17 @@
   function buildWheel() {
     var svg = $('wheel'), n = E.WHEEL.length, cx = 100, cy = 100, r = 96, i, html = '';
     function pt(deg, rad) { var a = deg * Math.PI / 180; return [cx + rad * Math.sin(a), cy - rad * Math.cos(a)]; }
-    var group = '<g id="rl-wheel-inner">';
+    var group = '<circle cx="100" cy="100" r="99" fill="#5a3418"/><circle cx="100" cy="100" r="94" fill="#2a1a10" stroke="#c9a227" stroke-width="1.2"/><g id="rl-wheel-inner">';
     for (i = 0; i < n; i++) {
       var num = E.WHEEL[i], mid = i * 360 / n, a1 = mid - 360 / n / 2, a2 = mid + 360 / n / 2;
-      var p1 = pt(a1, r), p2 = pt(a2, r), col = E.color(num);
+      var p1 = pt(a1, 92), p2 = pt(a2, 92), col = E.color(num);
       var fill = col === 'red' ? '#a3202c' : col === 'black' ? '#161616' : '#2e7d4f';
-      group += '<path d="M' + cx + ',' + cy + ' L' + p1[0].toFixed(2) + ',' + p1[1].toFixed(2) + ' A' + r + ',' + r + ' 0 0 1 ' + p2[0].toFixed(2) + ',' + p2[1].toFixed(2) + ' Z" fill="' + fill + '" stroke="#c9a227" stroke-width="0.4"/>';
-      var t = pt(mid, 80);
+      group += '<path d="M' + cx + ',' + cy + ' L' + p1[0].toFixed(2) + ',' + p1[1].toFixed(2) + ' A92,92 0 0 1 ' + p2[0].toFixed(2) + ',' + p2[1].toFixed(2) + ' Z" fill="' + fill + '" stroke="#c9a227" stroke-width="0.5"/>';
+      var t = pt(mid, 76);
       group += '<text x="' + t[0].toFixed(2) + '" y="' + t[1].toFixed(2) + '" transform="rotate(' + mid + ' ' + t[0].toFixed(2) + ' ' + t[1].toFixed(2) + ')" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#f4ecd9">' + num + '</text>';
     }
-    group += '<circle cx="100" cy="100" r="22" fill="#2a1a10" stroke="#c9a227" stroke-width="1.5"/></g>';
+    group += '<circle cx="100" cy="100" r="30" fill="#3b2415" stroke="#c9a227" stroke-width="1.5"/><circle cx="100" cy="100" r="6" fill="#c9a227"/></g>';
+    group += '<circle id="rl-ball" cx="100" cy="16" r="4" fill="#fbf8f1" stroke="#8a8a8a" stroke-width="0.6"/>';
     svg.innerHTML = group;
   }
   function turnWheelTo(n) {
@@ -59,6 +60,22 @@
     st.rot = base + 5 * 360 + ((360 - center) % 360);   // five full turns, then stop with the number under the pointer
     var inner = document.getElementById('rl-wheel-inner');
     if (inner) { inner.style.transition = 'transform ' + (SPIN_MS / 1000) + 's cubic-bezier(.18,.72,.2,1)'; inner.style.transform = 'rotate(' + st.rot + 'deg)'; inner.style.transformOrigin = '100px 100px'; }
+    spinBall();
+  }
+  // The ball goes round the rim the other way, slows down and drops into the pocket under the pointer
+  function spinBall() {
+    var ball = document.getElementById('rl-ball');
+    if (!ball) return;
+    var start = st.ball || 0, t0 = Date.now();
+    var total = 1440 + ((start % 360) + 360) % 360;      // a few turns, then the ball ends at the top (angle 0)
+    function frame() {
+      var t = Math.min(1, (Date.now() - t0) / SPIN_MS), e = 1 - Math.pow(1 - t, 3);
+      var a = start - total * e, rad = a * Math.PI / 180;
+      ball.setAttribute('cx', (100 + 88 * Math.sin(rad)).toFixed(2));
+      ball.setAttribute('cy', (100 - 88 * Math.cos(rad)).toFixed(2));
+      if (t < 1) requestAnimationFrame(frame); else st.ball = 0;
+    }
+    frame();
   }
 
   // ---- board -------------------------------------------------------------
