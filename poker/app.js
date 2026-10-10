@@ -124,7 +124,7 @@
   function soloOptions(L) {
     var p = P.get();
     return {
-      level: L, speed: p.speed, difficulty: p.difficulty, getDifficulty: function () { return P.get().difficulty; }, turnTimer: 0, takeover: 0, botRebuy: p.botRebuy,   // offline: no timer, you take all the time you want
+      level: L, speed: p.speed, getSpeed: function () { return P.get().speed; }, difficulty: p.difficulty, getDifficulty: function () { return P.get().difficulty; }, turnTimer: 0, takeover: 0, botRebuy: p.botRebuy,   // offline: no timer, you take all the time you want
       onChange: function (i, view) { if (i === 0 && game && game.kind === 'solo') { renderTable(view); saveSolo(); } },
       onCashOut: function (i, amount) {
         if (i !== 0) return;
@@ -146,7 +146,7 @@
     }
     opts = soloOptions(L); opts.seats = seats;
     if ($('blinds-up').checked) { opts.blindEvery = 10; opts.nextLevel = nextLevel; }
-    opts.speed = P.get().speed;
+    opts.speed = P.get().speed; opts.getSpeed = function () { return P.get().speed; };
     game = { kind: 'solo', level: L, table: null, leaving: false };
     game.table = makeSoloTable(opts);
     game.blindEvery = opts.blindEvery || 0;
@@ -645,7 +645,7 @@
     db.openHost(code, { resume: resume }).then(function () {
       game = { kind: 'host', code: code, db: db, level: L };
       game.host = ON.host(db, {
-        code: code, name: name, level: L, img: loadAvatar(), persona: myPersona(), difficulty: P.get().difficulty, blindEvery: blindEvery || 0, nextLevel: nextLevel, speed: P.get().speed, turnTimer: P.get().turnTimer, takeover: P.get().takeover,
+        code: code, name: name, level: L, img: loadAvatar(), persona: myPersona(), difficulty: P.get().difficulty, blindEvery: blindEvery || 0, nextLevel: nextLevel, speed: P.get().speed, getSpeed: function () { return P.get().speed; }, turnTimer: P.get().turnTimer, takeover: P.get().takeover,
         onView: function (view) { renderTable(view); saveHost(); },
         onSound: function (k) { sound(k); },
         onLog: function (text) { msg(text); },
@@ -846,7 +846,7 @@
     var db = ringDb();
     game = { kind: 'host', code: ROOM_CODE, db: db, level: L };
     game.host = ON.host(db, {
-      code: ROOM_CODE, name: name, level: L, speed: P.get().speed, turnTimer: P.get().turnTimer, takeover: P.get().takeover,
+      code: ROOM_CODE, name: name, level: L, speed: P.get().speed, getSpeed: function () { return P.get().speed; }, turnTimer: P.get().turnTimer, takeover: P.get().takeover,
       onView: function (view) { renderTable(view); },
       onLog: function (text) { msg(text); },
       onSound: function (k) { sound(k); },

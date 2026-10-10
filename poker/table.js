@@ -17,7 +17,8 @@
     var later = cfg.later || function (fn, ms) { return setTimeout(fn, ms); };
     var cancel = cfg.cancel || function (t) { clearTimeout(t); };
     var rnd = cfg.rnd || E.randomInt;
-    var pace = SPEED[cfg.speed] || SPEED.normaal;
+    // The pace is read at every move, so a change in the settings works at once (also during a game)
+    function paceNow() { var s = cfg.getSpeed ? cfg.getSpeed() : cfg.speed; return SPEED[s] || SPEED.normaal; }
     var T = {
       level: cfg.level,
       seats: (cfg.seats || []).map(function (s, i) {
@@ -114,12 +115,12 @@
       i = T.hand.current;
       s = T.seats[i];
       if (s.kind === 'bot') {
-        timer = later(function () { timer = null; botMove(i); }, Math.round(pace * (0.7 + 0.6 * rnd(1000) / 1000)));
+        timer = later(function () { timer = null; botMove(i); }, Math.round(paceNow() * (0.7 + 0.6 * rnd(1000) / 1000)));
         return;
       }
       if (s.kind === 'human' && T.autoPlay) {
         // the expert plays for you: the top level, a normal style, no timer
-        timer = later(function () { timer = null; expertMove(i); }, Math.round(pace * 0.8));
+        timer = later(function () { timer = null; expertMove(i); }, Math.round(paceNow() * 0.8));
         return;
       }
       limit = s.kind === 'human' ? T.turnTimer : T.takeover;
@@ -199,7 +200,7 @@
       if (T.hand.board.length) note('Bord: ' + T.hand.board.map(E.cardLabel).join(' '));
       T.seats.forEach(function (s, i) { if (s.leaving && s.kind !== 'empty') cashOut(i); });
       publish();
-      if (T.autoNext) pauseTimer = later(function () { pauseTimer = null; startHand(); }, pace * 2.5);
+      if (T.autoNext) pauseTimer = later(function () { pauseTimer = null; startHand(); }, paceNow() * 2.5);
       return res || { ok: true };
     }
 

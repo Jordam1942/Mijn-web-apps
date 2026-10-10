@@ -26,7 +26,7 @@
     for (var k = 1; k < 8; k++) seats.push({ id: null, name: 'Vrije stoel', kind: 'empty', stack: 0 });
     table = T.create({
       level: o.level, seats: seats, speed: o.speed, turnTimer: o.turnTimer, takeover: o.takeover, rnd: o.rnd, later: o.later, cancel: o.cancel, autoNext: o.autoNext,
-      difficulty: o.difficulty,
+      difficulty: o.difficulty, getSpeed: o.getSpeed,
       blindEvery: o.blindEvery, nextLevel: o.nextLevel,
       onChange: function (i, view) {
         if (i === null) { db.set(base(code) + '/pub', view); return; }
