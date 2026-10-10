@@ -3,21 +3,174 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1d2430">
+<meta name="theme-color" content="#14212e">
 <title>Uno</title>
-<style>
-  :root { --bg: #1d2430; --ink: #f2f4f7; --soft: #9aa5b5; color-scheme: dark; }
-  * { box-sizing: border-box; }
-  html, body { height: 100%; margin: 0; }
-  body { background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 24px 16px; }
-  h1 { font-size: 30px; font-weight: 800; margin: 0 0 8px; }
-  p { color: var(--soft); margin: 0 0 24px; max-width: 320px; }
-  a { display: inline-block; min-height: 48px; line-height: 48px; padding: 0 24px; border-radius: 14px; background: #2f74d0; color: #fff; font-weight: 700; text-decoration: none; }
-</style>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<h1>Uno</h1>
-<p>Het spel komt eraan. Het spelregels-deel is klaar; het scherm wordt nu gebouwd.</p>
-<a href="../">Terug naar Mijn spellen</a>
+
+<!-- Startscherm -->
+<section id="home" class="scherm">
+  <header class="kop">
+    <h1>Uno</h1>
+    <p>Kies hoe je speelt</p>
+  </header>
+
+  <div class="knoppen">
+    <button class="knop groot" id="btn-doorgaan" hidden>Doorgaan met het potje</button>
+    <button class="knop groot kleur-blauw" id="btn-nieuw">Tegen de computer</button>
+    <button class="knop groot uit" disabled>Met vrienden op afstand (binnenkort)</button>
+    <button class="knop groot uit" disabled>Dezelfde kamer, met QR (binnenkort)</button>
+  </div>
+
+  <section class="paneel">
+    <h2>Ranglijst</h2>
+    <p class="zacht" id="rang-leeg">Nog geen gewonnen potjes. Oefenpotjes tellen niet mee.</p>
+    <ol class="rang" id="rang"></ol>
+  </section>
+
+  <nav class="onder">
+    <button class="knop" id="btn-profiel">Mijn profiel</button>
+    <button class="knop" id="btn-instellingen">Instellingen</button>
+    <a class="knop" href="handleiding.html">Handleiding</a>
+  </nav>
+</section>
+
+<!-- Het potje -->
+<section id="tafel" class="scherm" hidden>
+  <header class="balk">
+    <button class="knop klein" id="btn-menu" aria-label="Terug naar het begin">‹ Menu</button>
+    <span class="titel">Uno</span>
+    <span class="badge" id="badge-oefenen" hidden>Oefenen</span>
+    <button class="knop klein" id="btn-zet-instellingen" aria-label="Instellingen">⚙</button>
+  </header>
+
+  <div class="tegen" id="tegen"></div>
+
+  <div class="midden">
+    <button class="stapel" id="stapel" aria-label="Pak een kaart">
+      <span class="stapel-aantal" id="stapel-aantal"></span>
+      <span class="card back"><span>UNO</span></span>
+    </button>
+    <div class="aflegstapel" id="aflegstapel"></div>
+    <div class="kleurbol" id="kleurbol" aria-label="Actieve kleur"></div>
+  </div>
+
+  <p class="melding" id="melding" aria-live="polite"></p>
+
+  <div class="kijk" id="kijk" hidden></div>
+
+  <div class="acties">
+    <button class="knop" id="btn-pas" hidden>Passen</button>
+    <button class="knop" id="btn-accepteer" hidden>Pak 4 accepteren</button>
+    <button class="knop" id="btn-aanvechten" hidden>Aanvechten</button>
+    <button class="knop uno" id="btn-uno" hidden>UNO!</button>
+  </div>
+
+  <div class="hand" id="hand" aria-label="Jouw kaarten"></div>
+</section>
+
+<!-- Kleur kiezen -->
+<div class="sheet" id="sheet-kleur" hidden>
+  <div class="blad">
+    <h2>Kies een kleur</h2>
+    <div class="kleurkeuze">
+      <button class="kleurknop rood" data-kleur="0" aria-label="rood"></button>
+      <button class="kleurknop geel" data-kleur="1" aria-label="geel"></button>
+      <button class="kleurknop groen" data-kleur="2" aria-label="groen"></button>
+      <button class="kleurknop blauw" data-kleur="3" aria-label="blauw"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Nieuw potje -->
+<div class="sheet" id="sheet-nieuw" hidden>
+  <div class="blad">
+    <h2>Hoeveel spelers?</h2>
+    <p class="zacht">Jij plus de computer. Je kunt 2 tot 8 spelers kiezen.</p>
+    <div class="aantallen" id="aantallen"></div>
+    <label class="schakel"><input type="checkbox" id="nieuw-oefenen"> Oefenen: ik zie alle kaarten</label>
+    <div class="rij">
+      <button class="knop" data-sluit>Annuleren</button>
+      <button class="knop kleur-blauw" id="nieuw-start">Start</button>
+    </div>
+  </div>
+</div>
+
+<!-- Uitslag -->
+<div class="sheet" id="sheet-uitslag" hidden>
+  <div class="blad">
+    <h2 id="uitslag-titel">Potje af</h2>
+    <p id="uitslag-tekst"></p>
+    <ol class="rang" id="uitslag-rang"></ol>
+    <div class="rij">
+      <button class="knop" id="uitslag-menu">Menu</button>
+      <button class="knop kleur-blauw" id="uitslag-opnieuw">Nog een potje</button>
+    </div>
+  </div>
+</div>
+
+<!-- Instellingen -->
+<div class="sheet" id="sheet-instellingen" hidden>
+  <div class="blad">
+    <h2>Instellingen</h2>
+    <label class="schakel"><input type="checkbox" id="set-geluid"> Geluid</label>
+    <label class="schakel"><input type="checkbox" id="set-animaties"> Animaties</label>
+    <label class="schakel"><input type="checkbox" id="set-oefenen"> Oefenmodus (ik zie alle kaarten)</label>
+    <label class="veld">Tempo van de computer
+      <select id="set-tempo">
+        <option value="rustig">Rustig</option>
+        <option value="normaal">Normaal</option>
+        <option value="snel">Snel</option>
+      </select>
+    </label>
+    <p class="zacht" id="set-hint">Minder beweging op dit toestel zet de animaties uit.</p>
+    <div class="versie">
+      <p>Versie <span id="versie"></span></p>
+      <a class="knop" href="handleiding.html#kaarten">Kaartenoverzicht</a>
+    </div>
+    <div class="rij"><button class="knop kleur-blauw" data-sluit>Klaar</button></div>
+  </div>
+</div>
+
+<!-- Profiel -->
+<div class="sheet" id="sheet-profiel" hidden>
+  <div class="blad">
+    <h2>Mijn profiel</h2>
+    <label class="veld">Naam
+      <input id="profiel-naam" maxlength="16" autocomplete="off">
+    </label>
+    <p class="zacht">Kies een personage</p>
+    <div class="personages" id="personages"></div>
+    <div class="foto">
+      <div id="profiel-voor"></div>
+      <label class="knop">Eigen foto
+        <input type="file" accept="image/*" id="profiel-foto" hidden>
+      </label>
+      <button class="knop" id="profiel-foto-weg">Foto verwijderen</button>
+    </div>
+    <div class="rij">
+      <button class="knop" data-sluit>Annuleren</button>
+      <button class="knop kleur-blauw" id="profiel-opslaan">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<div class="melding-vlak" id="toast" hidden></div>
+
+<script src="art.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="cards.js"></script>
+<script src="prefs.js"></script>
+<script src="sfx.js"></script>
+<script src="spel.js"></script>
+<script src="app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js'); });
+</script>
 </body>
 </html>

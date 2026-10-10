@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14212e">
+<title>Uno: handleiding</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  body { overflow: auto; }
+  .blad-tekst { max-width: 560px; margin: 0 auto; padding: 16px 16px 40px; }
+  .blad-tekst h1 { font-size: 30px; margin: 8px 0 6px; font-weight: 900; }
+  .blad-tekst h2 { margin-top: 26px; font-size: 21px; }
+  .blad-tekst p, .blad-tekst li { font-size: 17px; line-height: 1.5; }
+  .blad-tekst ul, .blad-tekst ol { padding-left: 22px; }
+  .terug { display: inline-flex; min-height: 44px; align-items: center; color: #9fc4ff; font-weight: 700; text-decoration: none; }
+  .kaarten-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 12px 0; }
+  .kaarten-grid .card { width: 100%; aspect-ratio: 1 / 1.45; }
+  .kaarten-grid .card .mid { font-size: 22px; }
+  .kaarten-grid .card .hoek { font-size: 11px; }
+  .uitleg-lijst { display: grid; gap: 10px; margin-top: 10px; }
+  .uitleg-rij { display: grid; grid-template-columns: 74px 1fr; gap: 12px; align-items: center; background: var(--paneel); border-radius: 14px; padding: 10px; }
+  .uitleg-rij .card { width: 74px; height: 107px; }
+  .uitleg-rij .card .mid { font-size: 30px; }
+  .uitleg-rij .card .hoek { font-size: 13px; }
+  .uitleg-rij p { margin: 0; font-size: 16px; }
+  .uitleg-rij b { display: block; font-size: 17px; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+<main class="blad-tekst">
+  <a class="terug" href="index.html">‹ Terug naar het spel</a>
+  <h1>Uno: handleiding</h1>
+  <p>Leg kaarten af tot je er geen meer hebt. Wie als eerste uitgaat, krijgt punten van de kaarten die de anderen nog hebben.</p>
+
+  <h2>Het begin</h2>
+  <ul>
+    <li>Iedereen krijgt 7 kaarten.</li>
+    <li>Er ligt één kaart open. Die is de bovenkaart.</li>
+    <li>Je kunt een kaart leggen die dezelfde kleur heeft, hetzelfde getal of hetzelfde symbool, of een kleurkeuze.</li>
+  </ul>
+
+  <h2>Je beurt</h2>
+  <ol>
+    <li>Leg een kaart die past, of</li>
+    <li>pak één kaart van de stapel. Past die, dan mag je hem meteen leggen. Past hij niet, dan past je beurt.</li>
+  </ol>
+  <p>Je mag alleen pakken als je geen kaart kunt leggen.</p>
+
+  <h2>De kaarten</h2>
+  <div class="uitleg-lijst" id="uitleg-lijst"></div>
+
+  <h2 id="kaarten">Kaartenoverzicht</h2>
+  <p>Alle kaartsoorten op een rij.</p>
+  <div class="kaarten-grid" id="kaarten-grid"></div>
+
+  <h2>UNO</h2>
+  <p>Heb je nog maar één kaart? Dan roep je UNO voordat de volgende speler speelt. Tik op de knop UNO!</p>
+  <p>Vergeet je het, en pakt iemand je voordat de volgende speler speelt? Dan pak je 2 kaarten.</p>
+
+  <h2>Kleurkeuze en Pak 4</h2>
+  <p>Met een kleurkeuze kies jij de kleur. Met Pak 4 kies je ook de kleur. Je mag Pak 4 alleen leggen als je geen kaart hebt van de kleur die lag.</p>
+  <p>De volgende speler pakt dan 4 kaarten en slaat zijn beurt over. Vindt hij dat je het niet mocht, dan kan hij aanvechten.</p>
+  <p>Bij aanvechten kijkt het spel of je nog een kaart had van de kleur die lag. Had je die, dan pak jij 4 kaarten. Had je hem niet, dan pakt de aanvaller 6 kaarten en slaat zijn beurt over.</p>
+
+  <h2>Oefenen</h2>
+  <p>Oefenen laat jou alle kaarten van de anderen zien. Zo kun je rustig uitleggen waarom een kaart past of niet. Een oefenpotje telt niet mee voor de ranglijst.</p>
+
+  <h2>Punten en de ranglijst</h2>
+  <p>Wie uitgaat, krijgt punten voor de kaarten van de anderen: getallen tellen hun waarde, actiekaarten 20 punten, kleurkeuzes 50 punten. Wie 500 punten haalt, wint het potje. Op de ranglijst telt alleen het aantal gewonnen potjes.</p>
+
+  <h2>Instellingen</h2>
+  <p>Zet geluid en animaties aan of uit, en kies het tempo van de computer. Staat op je toestel 'minder beweging' aan, dan zijn de animaties uit.</p>
+</main>
+
+<script src="engine.js"></script>
+<script src="cards.js"></script>
+<script>
+  (function () {
+    var E = UnoEngine, C = UnoCards;
+    // Uitleg per kaartsoort, met één voorbeeld in rood
+    var voorbeelden = [
+      { kind: 'num', color: 0, value: 5 }, { kind: 'skip', color: 0, value: 0 }, { kind: 'reverse', color: 0, value: 0 },
+      { kind: 'draw2', color: 0, value: 0 }, { kind: 'wild', color: 4, value: 0 }, { kind: 'wild4', color: 4, value: 0 }
+    ];
+    var namen = { num: 'Getal', skip: 'Sla over', reverse: 'Keer om', draw2: 'Pak 2', wild: 'Kleurkeuze', wild4: 'Pak 4' };
+    document.getElementById('uitleg-lijst').innerHTML = voorbeelden.map(function (k) {
+      return '<div class="uitleg-rij">' + C.html(k) + '<p><b>' + namen[k.kind] + '</b>' + C.uitleg(k) + '</p></div>';
+    }).join('');
+
+    // Alle verschillende kaarten: per kleur de getallen 0-9 en de actiekaarten, plus de wilds
+    var gezien = {}, rij = [];
+    E.CARDS.forEach(function (k) {
+      var sleutel = k.kind + ':' + k.color + ':' + k.value;
+      if (gezien[sleutel]) return;
+      gezien[sleutel] = true;
+      rij.push(k);
+    });
+    rij.sort(function (a, b) { return a.color - b.color || (a.kind < b.kind ? -1 : a.kind > b.kind ? 1 : a.value - b.value); });
+    document.getElementById('kaarten-grid').innerHTML = rij.map(function (k) { return C.html(k); }).join('');
+  })();
+</script>
+</body>
+</html>
