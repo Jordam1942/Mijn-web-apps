@@ -49,7 +49,7 @@
   // cards more carefully, raises more and bluffs more. The odds shown to you do not change.
   var LEVEL = {
     easy:    { raiseAdd: 0.25, bluffMul: 0, callAdd: 0.10, mistake: 0.15, iters: 150 },
-    normal:  { raiseAdd: 0,    bluffMul: 1, callAdd: 0,    mistake: 0,    iters: 250 },
+    normal:  { raiseAdd: 0.10, bluffMul: 0.5, callAdd: 0.05, mistake: 0.05, iters: 250 },
     hard:    { raiseAdd: -0.05, bluffMul: 1.5, callAdd: -0.02, mistake: 0, iters: 300 },
     extreme: { raiseAdd: -0.10, bluffMul: 1.5, callAdd: -0.04, mistake: 0, iters: 500 }
   };
