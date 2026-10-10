@@ -123,7 +123,7 @@
   function soloOptions(L) {
     var p = P.get();
     return {
-      level: L, speed: p.speed, turnTimer: 0, takeover: 0, botRebuy: p.botRebuy,   // offline: no timer, you take all the time you want
+      level: L, speed: p.speed, difficulty: p.difficulty, turnTimer: 0, takeover: 0, botRebuy: p.botRebuy,   // offline: no timer, you take all the time you want
       onChange: function (i, view) { if (i === 0 && game && game.kind === 'solo') { renderTable(view); saveSolo(); } },
       onCashOut: function (i, amount) {
         if (i !== 0) return;
@@ -572,7 +572,7 @@
     db.openHost(code, { resume: resume }).then(function () {
       game = { kind: 'host', code: code, db: db, level: L };
       game.host = ON.host(db, {
-        code: code, name: name, level: L, img: loadAvatar(), persona: myPersona(), blindEvery: blindEvery || 0, nextLevel: nextLevel, speed: P.get().speed, turnTimer: P.get().turnTimer, takeover: P.get().takeover,
+        code: code, name: name, level: L, img: loadAvatar(), persona: myPersona(), difficulty: P.get().difficulty, blindEvery: blindEvery || 0, nextLevel: nextLevel, speed: P.get().speed, turnTimer: P.get().turnTimer, takeover: P.get().takeover,
         onView: function (view) { renderTable(view); saveHost(); },
         onSound: function (k) { sound(k); },
         onLog: function (text) { msg(text); },
@@ -877,6 +877,7 @@
     var p = P.get(), box = $('settings-box');
     var html = '';
     html += '<div class="card-panel"><h3>Tempo en tijd</h3>' +
+      '<label class="field">Niveau computerspelers <select id="set-difficulty"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="extreme">Extreme</option></select></label>' +
       '<label class="field">Tempo computerspelers <select id="set-speed"><option value="rustig">Rustig</option><option value="normaal">Normaal</option><option value="snel">Snel</option></select></label>' +
       '<label class="field">Beurttimer voor jou (alleen bij vrienden) <select id="set-timer"><option value="0">Geen</option><option value="15">15 seconden</option><option value="30">30 seconden</option><option value="60">60 seconden</option></select></label>' +
       '<label class="field">Computer neemt over na (vrienden weg) <select id="set-takeover"><option value="0">Nooit</option><option value="30">30 seconden</option><option value="45">45 seconden</option><option value="60">60 seconden</option></select></label></div>';
@@ -885,11 +886,12 @@
     }).join('') + '</div>';
     html += '<div class="card-panel"><button class="btn" id="set-default">Standaardinstellingen</button><button class="btn danger" id="set-bank">Bank op 2.000 zetten</button><p class="fine">Speelgeld zonder waarde. Het spel heeft geen aankopen.</p></div>';
     box.innerHTML = html;
-    $('set-speed').value = p.speed; $('set-timer').value = String(p.turnTimer); $('set-takeover').value = String(p.takeover);
+    $('set-difficulty').value = p.difficulty; $('set-speed').value = p.speed; $('set-timer').value = String(p.turnTimer); $('set-takeover').value = String(p.takeover);
   }
   $('settings-box').addEventListener('change', function (e) {
     var t = e.target;
     if (t.id === 'set-speed') P.set('speed', t.value);
+    if (t.id === 'set-difficulty') P.set('difficulty', t.value);
     if (t.id === 'set-timer') P.set('turnTimer', +t.value);
     if (t.id === 'set-takeover') P.set('takeover', +t.value);
     if (t.dataset && t.dataset.set) P.set(t.dataset.set, t.checked);

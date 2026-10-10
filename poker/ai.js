@@ -45,15 +45,29 @@
     agressief: { raise: 0.5, bluff: 0.2, callBonus: -0.05, size: 1.0 }
   };
 
+  // Levels for the computer players. Easy plays loosely and sometimes makes a mistake; Extreme reads the
+  // cards more carefully, raises more and bluffs more. The odds shown to you do not change.
+  var LEVEL = {
+    easy:    { raiseAdd: 0.25, bluffMul: 0, callAdd: 0.10, mistake: 0.15, iters: 150 },
+    normal:  { raiseAdd: 0,    bluffMul: 1, callAdd: 0,    mistake: 0,    iters: 250 },
+    hard:    { raiseAdd: -0.05, bluffMul: 1.5, callAdd: -0.02, mistake: 0, iters: 300 },
+    extreme: { raiseAdd: -0.10, bluffMul: 1.5, callAdd: -0.04, mistake: 0, iters: 500 }
+  };
+
   // The move for a computer player: returns {type, to}. Uses only what the player may see.
-  function decide(h, idx, style, rand) {
+  function decide(h, idx, style, rand, level) {
     var P = h.players, me = P[idx], L = E.legal(h, idx), rnd = rand || Math.random;
-    var st = STYLE[style] || STYLE.gemiddeld;
+    var st = STYLE[style] || STYLE.gemiddeld, d = LEVEL[level] || LEVEL.normal;
     var opponents = P.filter(function (q, i) { return i !== idx && !q.out && !q.folded; }).length;
     var pot = P.reduce(function (s, q) { return s + q.total; }, 0);
-    var eq = share(odds(me.cards, h.board, opponents, h.board.length ? 250 : 200, rnd));
+    if (d.mistake > 0 && rnd() < d.mistake) {      // an easy computer sometimes just checks, calls or folds
+      if (L.canCheck) return { type: 'check' };
+      return rnd() < 0.5 ? { type: 'call' } : { type: 'fold' };
+    }
+    var eq = share(odds(me.cards, h.board, opponents, h.board.length ? d.iters : Math.round(d.iters * 0.8), rnd));
     var needed = L.toCall / (pot + L.toCall);      // pot odds
-    var bluff = rnd() < st.bluff;
+    var bluff = rnd() < st.bluff * d.bluffMul;
+    var raiseAt = st.raise + d.raiseAdd, callBonus = st.callBonus + d.callAdd;
 
     function raise() {
       var frac = st.size * (0.6 + 0.4 * rnd());
@@ -62,12 +76,12 @@
       return to >= L.maxTo ? { type: 'allin' } : { type: 'raise', to: to };
     }
     if (L.canCheck) {
-      if (L.canRaise && (eq > st.raise || bluff)) return raise();
+      if (L.canRaise && (eq > raiseAt || bluff)) return raise();
       return { type: 'check' };
     }
-    if (L.canRaise && eq > st.raise + 0.12) return raise();
+    if (L.canRaise && eq > raiseAt + 0.12) return raise();
     if (L.canRaise && bluff && eq > 0.3) return raise();
-    if (eq + st.callBonus >= needed) return { type: 'call' };
+    if (eq + callBonus >= needed) return { type: 'call' };
     return { type: 'fold' };
   }
 
@@ -77,7 +91,7 @@
     return E.evaluate(hole.concat(board));
   }
 
-  var api = { odds: odds, share: share, decide: decide, currentHand: currentHand, STYLE: STYLE };
+  var api = { odds: odds, share: share, decide: decide, currentHand: currentHand, STYLE: STYLE, LEVEL: LEVEL };
   root.PokerAI = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : this);

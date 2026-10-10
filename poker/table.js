@@ -125,7 +125,7 @@
     }
     function botMove(i) {
       if (!T.hand || T.hand.done || T.hand.current !== i) return;
-      apply(i, AI.decide(T.hand, i, T.seats[i].style, function () { return rnd(1000000) / 1000000; }));
+      apply(i, AI.decide(T.hand, i, T.seats[i].style, function () { return rnd(1000000) / 1000000; }, cfg.difficulty));
     }
     // Time is up: a person gets check or fold; someone away is taken over by the computer.
     function timeOut(i) {
@@ -137,7 +137,7 @@
         apply(i, { type: L.canCheck ? 'check' : 'fold' });
       } else {
         note('De computer speelt voor ' + s.name + '.');
-        apply(i, AI.decide(T.hand, i, s.style, function () { return rnd(1000000) / 1000000; }));
+        apply(i, AI.decide(T.hand, i, s.style, function () { return rnd(1000000) / 1000000; }, cfg.difficulty));
       }
     }
 

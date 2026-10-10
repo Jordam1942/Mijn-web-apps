@@ -15,6 +15,7 @@
     fxChips: true,            // chips to the pot
     fxWin: true,              // winner highlight
     speed: 'normaal',         // rustig | normaal | snel: pace of computer players
+    difficulty: 'normal',     // easy | normal | hard | extreme: how well the computer players play
     turnTimer: 30,            // seconds per turn for you (0 = no timer)
     takeover: 45,             // seconds before the computer plays for someone who is away (0 = never)
     confirmAllIn: true,       // ask before all-in
