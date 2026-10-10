@@ -320,6 +320,7 @@
       $('seats').insertAdjacentHTML('beforeend', '<div class="winner-banner">' + esc(v.result.join(' · ')) + '</div>');
     }
     lastScore = v.score || [];
+    $('b-auto').hidden = !(game && game.kind === 'solo') || v.done;
     if (v.log && v.log.length) msg(v.log[v.log.length - 1]);
     renderOdds(v);
     renderActions(v);
@@ -417,6 +418,7 @@
   function send(action) {
     if (!game) return;
     if (game.kind === 'solo') {
+      if (game.table.autoPlay) setAuto(false);     // you act yourself: you have taken over
       var before = game.table.fullSnapshot();
       var res = game.table.act(0, action);
       if (!res.ok) { msg(res.error); sound('error'); return; }
@@ -442,6 +444,15 @@
     var v = currentView(); if (!v || !v.legal) return;
     send(v.legal.canCheck ? { type: 'check' } : { type: 'call' });
   });
+  // The expert plays for you until you take over again
+  function setAuto(on) {
+    if (!game || game.kind !== 'solo') return;
+    game.table.setAuto(on);
+    $('b-auto').textContent = on ? 'Ik speel weer zelf' : 'Laat de computer voor mij spelen';
+    $('b-auto').classList.toggle('gold', on);
+    if (on) msg('De computer speelt voor jou. Tik op "Ik speel weer zelf" om over te nemen.');
+  }
+  $('b-auto').addEventListener('click', function () { setAuto(!(game && game.table.autoPlay)); });
   $('b-undo').addEventListener('click', function () {
     if (!game || game.kind !== 'solo' || !game.undo) return;
     game.table.restoreFull(game.undo);

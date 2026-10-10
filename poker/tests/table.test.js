@@ -146,6 +146,25 @@ test('leaving at once: the stack comes back now, the pot stays, the chips still 
   assert.strictEqual(after, before, 'fiches kloppen niet');
 });
 
+test('the expert plays for you, the chips still add up, and you can take over again', () => {
+  const Q = makeQueue();
+  const seats = [
+    { id: 'a', name: 'Jij', kind: 'human', stack: 1000 },
+    { id: 'b', name: 'Bram', kind: 'bot', stack: 1000, style: 'gemiddeld' },
+    { id: 'c', name: 'Carla', kind: 'bot', stack: 1000, style: 'agressief' }
+  ];
+  const table = T.create({ level: { sb: 5, bb: 10, min: 200, max: 1000 }, seats, speed: 'snel', rnd: seededRnd(31), autoNext: false, later: Q.later, cancel: Q.cancel, difficulty: 'normal' });
+  table.setAuto(true);
+  const start = seats.reduce((s, x) => s + x.stack, 0);
+  table.startHand();
+  for (let k = 0; k < 4000 && !(table.hand && table.hand.done); k++) { if (Q.size() === 0) break; Q.run(1); }
+  assert.ok(table.hand && table.hand.done, 'de ronde is niet klaar');
+  assert.ok(table.hand.history.some(h => h.idx === 0), 'de expert heeft geen zet gedaan voor jou');
+  assert.strictEqual(table.seats.reduce((s, x) => s + x.stack, 0), start, 'fiches kloppen niet');
+  table.setAuto(false);
+  assert.strictEqual(table.autoPlay, false, 'overnemen lukt niet');
+});
+
 let failed = 0;
 for (const [name, fn] of tests) {
   try { fn(); console.log('ok  ' + name); }

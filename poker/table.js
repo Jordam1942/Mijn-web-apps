@@ -117,6 +117,11 @@
         timer = later(function () { timer = null; botMove(i); }, Math.round(pace * (0.7 + 0.6 * rnd(1000) / 1000)));
         return;
       }
+      if (s.kind === 'human' && T.autoPlay) {
+        // the expert plays for you: the top level, a normal style, no timer
+        timer = later(function () { timer = null; expertMove(i); }, Math.round(pace * 0.8));
+        return;
+      }
       limit = s.kind === 'human' ? T.turnTimer : T.takeover;
       if (limit > 0) {
         T.turnDeadline = Date.now() + limit * 1000;
@@ -124,6 +129,17 @@
       }
       if (cfg.onTurn) cfg.onTurn(i);
     }
+    function expertMove(i) {
+      if (!T.hand || T.hand.done || T.hand.current !== i) return;
+      apply(i, AI.decide(T.hand, i, 'gemiddeld', function () { return rnd(1000000) / 1000000; }, 'extreme'));
+    }
+    // Let the expert play for you, or take over again (at any moment)
+    T.autoPlay = false;
+    T.setAuto = function (on) {
+      T.autoPlay = !!on;
+      if (cfg.onAuto) cfg.onAuto(T.autoPlay);
+      scheduleTurn();
+    };
     function botMove(i) {
       if (!T.hand || T.hand.done || T.hand.current !== i) return;
       apply(i, AI.decide(T.hand, i, T.seats[i].style, function () { return rnd(1000000) / 1000000; }, levelNow()));
@@ -292,6 +308,7 @@
     function stop() { stopTimer(); if (pauseTimer) { cancel(pauseTimer); pauseTimer = null; } }
 
     T.startHand = startHand;
+    T.expertMove = expertMove;
     T.act = act;
     T.leave = leave;
     T.leaveNow = leaveNow;
