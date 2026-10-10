@@ -4,7 +4,7 @@ var CACHE = 'poker-v1';   // own prefix: the other apps on this site use other p
 var FILES = [
   './', 'index.html', 'handleiding.html', 'styles.css', 'manifest.webmanifest',
   'engine.js', 'ai.js', 'art.js', 'money.js', 'table.js', 'online.js', 'prefs.js', 'sfx.js',
-  'ring.js', 'net.js', 'peer.js', 'app.js',
+  'ring.js', 'net.js', 'peer.js', 'app.js', 'roulette-engine.js', 'roulette-game.js',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png',
   'vendor/qrcode.js', 'vendor/jsqr.js', 'vendor/peerjs.min.js'
 ];

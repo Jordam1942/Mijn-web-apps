@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   var E = window.Roulette, M = window.PokerMoney;
-  var $ = function (id) { return document.getElementById(id); };
+  var $ = function (id) { return document.getElementById('rl-' + id); };
 
   var CHIPS = [5, 10, 25, 100, 500, 1000];
   var CHIP_COLOR = { 5: '#a3202c', 10: '#1f4e8c', 25: '#2e7d4f', 100: '#1a1a1a', 500: '#6a3c8c', 1000: '#c9a227' };
@@ -40,7 +40,7 @@
   function buildWheel() {
     var svg = $('wheel'), n = E.WHEEL.length, cx = 100, cy = 100, r = 96, i, html = '';
     function pt(deg, rad) { var a = deg * Math.PI / 180; return [cx + rad * Math.sin(a), cy - rad * Math.cos(a)]; }
-    var group = '<g id="wheel-inner">';
+    var group = '<g id="rl-wheel-inner">';
     for (i = 0; i < n; i++) {
       var num = E.WHEEL[i], mid = i * 360 / n, a1 = mid - 360 / n / 2, a2 = mid + 360 / n / 2;
       var p1 = pt(a1, r), p2 = pt(a2, r), col = E.color(num);
@@ -57,7 +57,7 @@
     var center = idx * per;                             // this slot's angle from the top
     var base = Math.ceil(st.rot / 360) * 360;           // next full turn
     st.rot = base + 5 * 360 + ((360 - center) % 360);   // five full turns, then stop with the number under the pointer
-    var inner = document.getElementById('wheel-inner');
+    var inner = document.getElementById('rl-wheel-inner');
     if (inner) { inner.style.transition = 'transform ' + (SPIN_MS / 1000) + 's cubic-bezier(.18,.72,.2,1)'; inner.style.transform = 'rotate(' + st.rot + 'deg)'; inner.style.transformOrigin = '100px 100px'; }
   }
 
@@ -232,7 +232,7 @@
   // ---- screen ----------------------------------------------------------------
   function setButtons() {
     var busy = st.spinning || !!st.auto;
-    ['btn-undo', 'btn-clear', 'btn-repeat', 'btn-spin'].forEach(function (id) { $(id).disabled = busy; });
+    ['rl-btn-undo', 'rl-btn-clear', 'rl-btn-repeat', 'rl-btn-spin'].forEach(function (id) { document.getElementById(id).disabled = busy; });
     $('btn-auto-toggle').setAttribute('aria-pressed', st.auto ? 'true' : 'false');
     $('btn-auto-toggle').classList.toggle('on', !!st.auto);
     $('btn-auto-toggle').title = st.auto ? 'Stop de bot' : 'Bot speelt voor mij';

@@ -32,6 +32,7 @@
     <div class="menu-buttons">
       <button class="btn big" data-go="setup">Spelen tegen de computer</button>
       <button class="btn" id="btn-resume" hidden>Verder spelen</button>
+      <button class="btn" data-go="roulette">Roulette<small>Rad van fortuin met speelgeld</small></button>
       <button class="btn" data-go="multi">Multiplayer</button>
       <button class="btn" data-go="profile">Mijn profiel</button>
     </div>
@@ -237,6 +238,65 @@
   <div class="sheet" id="sheet-body"></div>
 </div>
 
+<section id="s-roulette" class="screen rl-screen">
+  <header class="topbar">
+    <button class="icon" data-go="menu" aria-label="Terug naar het menu">‹</button>
+    <div class="lvl">Roulette · <span id="rl-bank">–</span></div>
+    <button class="icon" id="rl-btn-auto-toggle" aria-label="Bot speelt voor mij" title="Bot speelt voor mij" aria-pressed="false">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 8V4M9 4h6"/><circle cx="9.5" cy="13" r="1.3" fill="currentColor"/><circle cx="14.5" cy="13" r="1.3" fill="currentColor"/><path d="M9.5 16.5h5"/></svg>
+    </button>
+  </header>
+
+  <div class="rl-main">
+    <div class="rl-top">
+      <div class="rl-wheel" aria-hidden="true"><div class="pointer"></div><svg id="rl-wheel" viewBox="0 0 200 200"></svg></div>
+      <div class="rl-result" id="rl-result" aria-live="polite">Zet je fiches en draai het rad.</div>
+      <div class="rl-history" id="rl-history" aria-label="Laatste uitslagen"></div>
+    </div>
+
+    <div class="rl-board-wrap">
+      <div class="rl-board" id="rl-board"></div>
+    </div>
+
+    <div class="rl-bots" id="rl-bots" aria-label="Spelers aan tafel"></div>
+    <div class="msg rl-msg" id="rl-msg" aria-live="polite"></div>
+
+    <div class="rl-auto" id="rl-auto-panel" hidden>
+      <div class="rl-auto-row">
+        <label class="field">Bot zet op
+          <select id="rl-auto-bet">
+            <option value="red">Rood</option>
+            <option value="black">Zwart</option>
+            <option value="even">Even</option>
+            <option value="odd">Oneven</option>
+            <option value="low">1 t/m 18</option>
+            <option value="high">19 t/m 36</option>
+          </select>
+        </label>
+        <label class="field">Aantal draaien
+          <select id="rl-auto-spins"><option>10</option><option selected>25</option><option>50</option></select>
+        </label>
+      </div>
+      <p class="fine">De bot zet telkens je gekozen fiche op deze inzet. Hij stopt als je bank te laag is, je 20% van je bank kwijt bent, of het aantal draaien op is. Roulette heeft altijd een voordeel voor het huis, dus op lange termijn verlies je gemiddeld. De bot wint niet "vanzelf".</p>
+      <div class="rl-auto-row">
+        <button class="btn gold" id="rl-auto-start">Start de bot</button>
+        <button class="btn ghost" id="rl-auto-stop" disabled>Stop</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="rl-controls">
+    <div class="rl-chips" id="rl-chips" role="group" aria-label="Kies een fiche"></div>
+    <div class="rl-buttons">
+      <button class="btn small ghost" id="rl-btn-undo">Ongedaan</button>
+      <button class="btn small ghost" id="rl-btn-clear">Wis inzet</button>
+      <button class="btn small ghost" id="rl-btn-repeat">Vorige inzet</button>
+      <button class="btn gold rl-spin" id="rl-btn-spin">Draai het rad</button>
+    </div>
+    <div class="rl-sum fine" id="rl-sum">Jouw inzet: 0</div>
+  </div>
+</section>
+
 <script src="vendor/qrcode.js"></script>
 <script src="vendor/peerjs.min.js"></script>
 <script src="engine.js"></script>
@@ -250,6 +310,8 @@
 <script src="net.js"></script>
 <script src="ring.js"></script>
 <script src="peer.js"></script>
+<script src="roulette-engine.js"></script>
+<script src="roulette-game.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

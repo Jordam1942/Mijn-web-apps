@@ -376,3 +376,81 @@ table.score td.hostbtns { text-align: left; padding-bottom: 10px; }
 .oc-area { fill: rgba(240, 207, 122, 0.18); }
 .oc-line { fill: none; stroke: var(--gold-hi); stroke-width: 1.4; stroke-linejoin: round; stroke-linecap: round; opacity: 0.85; }
 .oc-dot { fill: var(--gold-hi); }
+
+/* Roulette (its own screen in this app) */
+/* Roulette: the same casino look as Royal Flush Society (colours and buttons come from ../poker/styles.css). */
+.rl-screen { background: var(--bg); }
+.rl-screen .topbar .icon { display: grid; place-items: center; }
+#s-roulette .lvl { flex: 1; min-width: 0; font-size: 14px; color: var(--ink-soft); }
+#rl-bank { color: var(--gold-hi); font-family: var(--serif); font-variant-numeric: tabular-nums; }
+#rl-btn-auto-toggle.on { background: linear-gradient(#f0cf7a, #b98b33); color: #2a1a06; border-color: var(--gold-hi); }
+
+.rl-main { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 4px 8px 0; }
+
+/* Wheel and result */
+.rl-top { display: flex; align-items: center; gap: 10px; }
+.rl-wheel { position: relative; width: 88px; height: 88px; flex: 0 0 auto; }
+.rl-wheel svg { width: 100%; height: 100%; display: block; }
+.rl-wheel .pointer { position: absolute; left: 50%; top: -3px; transform: translateX(-50%); width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 10px solid var(--gold-hi); z-index: 2; }
+.rl-result { flex: 1; min-width: 0; font-size: 14px; color: var(--ink); }
+.rl-result.win { color: #7fe0a4; }
+.rl-result.lose { color: #ff9aa2; }
+.rl-history { display: flex; gap: 3px; flex-wrap: wrap; justify-content: flex-end; max-width: 120px; }
+.rl-history .h { min-width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff; border: 1px solid var(--gold-lo); }
+.rl-history .h.red { background: #a3202c; }
+.rl-history .h.black { background: #161616; }
+.rl-history .h.green { background: #2e7d4f; }
+
+/* Board: a number grid (3 rows of 12, zero on the left) with the outside bets underneath */
+.rl-board-wrap { min-width: 0; }
+.rl-board { display: grid; grid-template-columns: 24px repeat(12, minmax(0, 1fr)) 30px; grid-auto-rows: 34px; gap: 2px; }
+.cell { position: relative; min-width: 0; border: 1px solid rgba(240, 207, 122, 0.35); background: rgba(10, 58, 37, 0.85); color: #f4ecd9; border-radius: 4px; font-size: 11px; font-weight: 600; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.cell:active { transform: translateY(1px); }
+.cell:disabled { cursor: default; }
+.cell.red { background: #7d1a22; }
+.cell.black { background: #161616; }
+.cell.zero { background: #2e7d4f; }
+.cell.outside { background: rgba(20, 12, 15, 0.9); font-size: 12px; letter-spacing: 0.02em; }
+.cell.col { background: rgba(20, 12, 15, 0.9); font-size: 11px; color: var(--ink-soft); }
+.cell .n { position: relative; z-index: 1; }
+.cell .amt { position: absolute; right: 1px; top: 1px; font-size: 9px; background: var(--gold-hi); color: #2a1a06; border-radius: 6px; padding: 0 3px; font-weight: 700; display: none; }
+.cell.has-bet .amt { display: block; }
+.cell .bot { position: absolute; left: 1px; bottom: 0; font-size: 8px; color: #c9bda6; }
+.cell.has-bet { box-shadow: inset 0 0 0 2px var(--gold-hi); }
+
+/* Computer players */
+.rl-bots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.rl-bot { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 4px 6px; font-size: 12px; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.rl-bot b { color: var(--ink); font-weight: 600; }
+.rl-bot span { color: var(--gold-hi); font-variant-numeric: tabular-nums; }
+.rl-bot small { color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* The robot */
+.rl-auto { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
+.rl-auto-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+.rl-auto-row .field { flex: 1; min-width: 120px; }
+.rl-auto-row .btn { flex: 1; }
+.rl-auto p { margin: 0; }
+
+/* Bottom controls */
+.rl-controls { padding: 6px 8px 8px; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); }
+.rl-chips { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.chip-pick { width: 52px; height: 52px; border-radius: 50%; border: 2px dashed rgba(255, 255, 255, 0.45); color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7); box-shadow: 0 3px 6px rgba(0, 0, 0, 0.45); }
+.chip-pick.on { border: 3px solid var(--gold-hi); box-shadow: 0 0 0 2px rgba(240, 207, 122, 0.4), 0 3px 6px rgba(0, 0, 0, 0.45); }
+.rl-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+.rl-buttons .btn { flex: 1; min-width: 80px; }
+.rl-buttons .rl-spin { flex: 2; min-width: 140px; }
+.rl-sum { text-align: center; margin: 0; }
+
+/* Landscape and computers: the board and the wheel side by side */
+@media (orientation: landscape) and (min-width: 700px) {
+  .rl-main { display: grid; grid-template-columns: minmax(0, 1fr) 280px; grid-template-rows: auto auto minmax(0, 1fr); column-gap: 14px; align-content: start; }
+  .rl-top { grid-column: 2; grid-row: 1; flex-direction: column; align-items: stretch; }
+  .rl-history { max-width: none; justify-content: center; }
+  .rl-board-wrap { grid-column: 1; grid-row: 1 / span 3; align-self: start; }
+  .rl-bots { grid-column: 2; grid-row: 2; grid-template-columns: 1fr; }
+  .rl-auto { grid-column: 2; grid-row: 3; }
+  .rl-board { grid-auto-rows: 40px; min-width: 0; }
+  .msg { grid-column: 1 / -1; }
+}
+.screen.rl-screen { max-width: 980px; }

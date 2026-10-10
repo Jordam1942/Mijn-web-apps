@@ -1,6 +1,6 @@
 // Roulette rules: the wheel, the colours, the payouts and a fair spin.
-// Run with: node roulette/tests/engine.test.js
-const R = require('../engine.js');
+// Run with: node poker/tests/roulette.test.js
+const R = require('../roulette-engine.js');
 const assert = require('assert');
 
 const tests = [];
