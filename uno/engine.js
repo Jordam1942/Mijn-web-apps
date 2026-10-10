@@ -280,15 +280,17 @@
   }
 
   // Wat één speler van de staat mag zien: alleen de eigen hand, geen trekstapel en geen verborgen kaarten.
-  function viewFor(state, viewer) {
+  // Oefenen: de host (oefenHost) ziet alle handen, zodat hij naast een vriend kan helpen.
+  function viewFor(state, viewer, opts) {
     var v = clone(state);
+    var seeAll = !!(opts && opts.oefenen && opts.oefenHost === viewer);
     v.hands = v.hands.map(function (hand, p) {
-      return p === viewer ? hand : hand.map(function () { return null; });
+      return p === viewer || seeAll ? hand : hand.map(function () { return null; });
     });
     v.drawCount = v.draw.length;
     v.draw = [];
     if (v.pending) v.pending.prevHand = null;
-    if (v.drawn && v.drawn.p !== viewer) v.drawn.card = null;
+    if (v.drawn && v.drawn.p !== viewer && !seeAll) v.drawn.card = null;
     return v;
   }
 

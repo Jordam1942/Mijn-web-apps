@@ -224,6 +224,18 @@ test('privé: een speler ziet alleen zijn eigen hand, niet de trekstapel', () =>
   assert.strictEqual(v.drawCount, s.draw.length);
 });
 
+test('oefenen: alleen de host ziet alle handen, en alleen als oefenen aan staat', () => {
+  const s = U.newGame({ players: 3, rng: seeded(12) });
+  const host = U.viewFor(s, 0, { oefenen: true, oefenHost: 0 });
+  assert.ok(host.hands[1].every(x => typeof x === 'number'));
+  assert.ok(host.hands[2].every(x => typeof x === 'number'));
+  const vriend = U.viewFor(s, 1, { oefenen: true, oefenHost: 0 });
+  assert.ok(vriend.hands[0].every(x => x === null));
+  const geen = U.viewFor(s, 0, { oefenen: false, oefenHost: 0 });
+  assert.ok(geen.hands[1].every(x => x === null));
+  assert.deepStrictEqual(host.draw, []);
+});
+
 // Duizenden willekeurige potjes. Na elke zet worden de regels gecontroleerd.
 test('duizenden willekeurige potjes: 108 kaarten, de beurt, de richting en geen ongeldige kaart', () => {
   let moves = 0, finished = 0, rounds = 0, unoCalls = 0, catches = 0;
