@@ -102,6 +102,9 @@
       // Sit down at the table yourself with this many fiches (the hand starts when two can play).
       sitDown: function (buy) { table.seats[0].stack = buy; table.startHand(); },
       leave: function () { table.leave(0); },
+      // The computer plays for the host (expert), until the host takes over again
+      setAuto: function (on) { table.setAuto(on); },
+      autoPlay: function () { return !!table.autoPlay; },
       leaveNow: function () { table.leaveNow(0); },
       start: function () { table.startHand(); },
       chat: function (text) { db.push(base(code) + '/chat', { name: o.name || 'Host', text: String(text).slice(0, 200), at: Date.now() }); },

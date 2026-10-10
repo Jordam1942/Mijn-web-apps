@@ -320,7 +320,8 @@
       $('seats').insertAdjacentHTML('beforeend', '<div class="winner-banner">' + esc(v.result.join(' · ')) + '</div>');
     }
     lastScore = v.score || [];
-    $('t-auto').hidden = !(game && game.kind === 'solo');
+    $('t-auto').hidden = !(game && (game.kind === 'solo' || game.kind === 'host'));
+    $('t-auto').classList.toggle('on', autoOn());
     if (v.log && v.log.length) msg(v.log[v.log.length - 1]);
     renderOdds(v);
     renderActions(v);
@@ -417,8 +418,8 @@
 
   function send(action) {
     if (!game) return;
+    if (autoOn()) setAuto(false);                  // you act yourself: you have taken over
     if (game.kind === 'solo') {
-      if (game.table.autoPlay) setAuto(false);     // you act yourself: you have taken over
       var before = game.table.fullSnapshot();
       var res = game.table.act(0, action);
       if (!res.ok) { msg(res.error); sound('error'); return; }
@@ -445,14 +446,20 @@
     send(v.legal.canCheck ? { type: 'check' } : { type: 'call' });
   });
   // The expert plays for you until you take over again
+  // The expert plays for the seat of the host too (online), so the button works at both
+  function autoOn() {
+    if (!game) return false;
+    if (game.kind === 'solo') return !!game.table.autoPlay;
+    return game.kind === 'host' && game.host ? game.host.autoPlay() : false;
+  }
   function setAuto(on) {
-    if (!game || game.kind !== 'solo') return;
-    game.table.setAuto(on);
+    if (!game || (game.kind !== 'solo' && game.kind !== 'host')) return;
+    if (game.kind === 'solo') game.table.setAuto(on); else game.host.setAuto(on);
     $('t-auto').classList.toggle('on', on);
     $('t-auto').title = on ? 'Ik speel weer zelf' : 'Laat de computer voor mij spelen';
     if (on) msg('De computer speelt voor jou. Tik op "Ik speel weer zelf" om over te nemen.');
   }
-  $('t-auto').addEventListener('click', function () { setAuto(!(game && game.table.autoPlay)); });
+  $('t-auto').addEventListener('click', function () { setAuto(!autoOn()); });
   $('b-undo').addEventListener('click', function () {
     if (!game || game.kind !== 'solo' || !game.undo) return;
     game.table.restoreFull(game.undo);
